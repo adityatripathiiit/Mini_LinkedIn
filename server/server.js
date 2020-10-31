@@ -1,5 +1,6 @@
 
 var net = require('net');
+const jwt = require('./authentication /jwt');
 
 var HOST = '127.0.0.1';
 var PORT = 6969;
@@ -14,6 +15,8 @@ connectMongo();
 // The sock object the callback function receives UNIQUE for each connection
 net.createServer(function(sock) {
   // We have a connection - a socket object is assigned to the connection automatically
+  // Auth
+  // jwt();
  console.log('CONNECTED: ' + sock.remoteAddress +':'+ sock.remotePort);
 //  sock.setNoDelay(true);
  
@@ -22,6 +25,8 @@ net.createServer(function(sock) {
     console.log('DATA ' + sock.remoteAddress + ': ' + data);
     // Write the data back to the socket, the client will receive it as data from the server
     sock.write('You said "' + data + '"');
+    var data = JSON.parse(data);
+    console.log(data.Method);
   });
   // Add a 'close' event handler to this instance of socket
  sock.on('close', function(data) {
