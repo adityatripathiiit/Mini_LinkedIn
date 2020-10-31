@@ -1,4 +1,4 @@
-var mongoose =require('mongoose');
+const mongoose = require('mongoose');
 
 var userschema = mongoose.Schema({
     applicant_id : {
@@ -104,6 +104,8 @@ var userschema = mongoose.Schema({
 
 });
 
-const User = mongoose.model('User',userschema);
+module.exports =  mongoose.model('User', userschema)
 
-module.exports.User = User;
+// const User = mongoose.model('User',userschema);
+
+// module.exports.User = User;

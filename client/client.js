@@ -7,15 +7,18 @@ var client = new net.Socket();
 client.connect(PORT, HOST, function() {
 console.log('CONNECTED TO: ' + HOST + ':' + PORT);
   // Write a message to the socket as soon as the client is connected, the server will receive it as message from the client
-  const data = {'Method': 'GET', 'Route': '/authenticate'}; 
+  var data = {'Method': 'GET', 'Route': '/authenticate', "Body":{"password":"Pass", "email":"mail123@mail.com"}, "token": ""};
   client.write(JSON.stringify(data));
+  const token = data.user.token;
+  
 
+  
 });
 
 // Add a 'data' event handler for the client socket
 // data is what the server sent to this socket
 client.on('data', function(data) {
-  console.log('DATA: ' + data);
+  console.log('Response ' + data);
   // Close the client socket completely
   client.destroy();
 });
@@ -23,4 +26,4 @@ client.on('data', function(data) {
 // Add a 'close' event handler for the client socket
 client.on('close', function() {
   console.log('Connection closed');
-});
+});""
