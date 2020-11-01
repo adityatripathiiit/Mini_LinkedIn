@@ -39,12 +39,6 @@ net.createServer(function(sock) {
     // sock.write('You said "' + data + '"');
     var data = JSON.parse(data);
     
-    const tok = requireLogin(data.token);
-    if(tok == 0)
-    {
-      return;
-    }
-
     // console.log(data.Method);
     if(data.Method == 'POST' && data.Route == '/register')
     {
@@ -61,6 +55,12 @@ net.createServer(function(sock) {
         sock.write(JSON.stringify(res));
       });
     }
+
+    // const tok = requireLogin(data.token);
+    // if(tok == 0)
+    // {
+    //   return;
+    // }
 
   });
   // Add a 'close' event handler to this instance of socket
