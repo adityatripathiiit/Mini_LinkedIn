@@ -1,14 +1,14 @@
 const mongoose = require('mongoose');
 
-var userschema = mongoose.Schema({
-    applicant_id : {
+var userSchema = mongoose.Schema({
+    _id : {
       type: String
     },
-    first_name : {
+    firstName : {
         type : String,
         required : true
     },
-    last_name : {
+    lastName : {
         type : String,
         required : true
     },
@@ -19,93 +19,120 @@ var userschema = mongoose.Schema({
     status : {
         type:String
     },
+    title : {
+        type:String
+    },
     email : {
         type : String,
         required : true
     },
-    recruiter_flag : {
-        type : Number
-    },
-    student_flag : {
-        type : Number
-    },
     address : {
         type : String,
     },
-    state : {
-        type : String,
-
-    },
-    city : {
+    skills : [
+        {
+            type : String,
+            endorsedBy: [
+                {
+                    type:String
+                }
+            ]
+        }
+    ],        
+    profileImg : {                         
         type : String
-    },
-    country : {
-      type : String
-    },
-    zip_code : {
-        type : String
-    },
-    company : {
-      type : String
-    },
-    experience : {
-        type : Number
-    },
-    education : {
-        type : String
-    },
-    school : {
-      type : String
-    },
-    skills : {
-        type : String
-    },
-    profile_summary : {
-        type : String
-    },
-    headline : {
-      type : String
-    },
-    job_title : {
-      type : String
-    },
-    profile_img : {
-        type : String
-    },
-    workexperience : {
-      type: Array
-    },
-    educationDetails : {
-      type: Array
     },
     connections:[
-        {
-            email:String,
-            first_name:String,
-            last_name:String,
-            job_title:String,
-            experience:Number,
+        {                    
+            type:String                
         }
     ],
-    pending:[{
-        email:String,
-        first_name:String,
-        last_name:String,
-        job_title:String,
-    }
-    ],
-    waiting:[
+
+    // Sent not accepted
+    connectionRequestsSent:[
+        {
+            type: String            
+        }
     ],
 
-    
-    resume_path: {type : Array, required : false},
-    saved_job : {type : Array, required : false},
-    applied_job:{type : Array, required : false}
+    // Received but not accepted by this user
+    connectionRequestsReceived:[
+        {
+            type: String            
+        }
+    ],
 
+    experience : [
+        {
+            title:{
+                type: String,
+                required: true
+            },
+            companyName:{
+                type: String,
+                required: true
+            },
+            description:{
+                type:String
+            },
+            startTimeStamp:{
+                type: Date,
+                required: true
+            },            
+            endTimeStamp:{
+                type: Date
+            }
+        }
+    ],
+    education : [
+         {
+            instituteName:{
+                type: String,
+                required: true
+            },            
+            description:{
+                type:String
+            },
+            startTimeStamp:{
+                type: Date,
+                required: true
+            },            
+            endTimeStamp:{
+                type: Date
+            }
+         }
+    ],
+    applieadToJobs: [
+        {
+            companyId: {
+                type:String,
+                required:true
+            },
+            appliedAt:{
+                type: Date,
+                required: true
+            } 
+        }
+    ],
+    viewedBy: [
+        {
+            userId: String,
+            required: true
+        }
+    ],
+    posts: [
+        {
+            postId: {
+                type: String, 
+                required: true, 
+            },
+            postedAt: {
+                type: Date,
+                required: true
+            }
+        }
+    ]
 });
 
-module.exports =  mongoose.model('User', userschema)
+module.exports =  mongoose.model('User', userSchema)
 
-// const User = mongoose.model('User',userschema);
-
-// module.exports.User = User;

@@ -14,7 +14,10 @@ connectMongo();
 
 function requireLogin(token){
   try{
-    return jwt.verify(token, config.secret);
+    if(token){
+      return jwt.verify(token, config.secret);
+    }
+    return 0; 
   }catch(err)
   {
     console.log(err);
@@ -22,48 +25,121 @@ function requireLogin(token){
   }
 }
 
-// Create a server instance, and chain the listen function to it
-// The function passed to net.createServer() becomes the event handler for the 'connection' event
-// The sock object the callback function receives UNIQUE for each connection
 net.createServer(function(sock) {
-  // We have a connection - a socket object is assigned to the connection automatically
-  // Auth
-  // jwt();
- console.log('CONNECTED: ' + sock.remoteAddress +':'+ sock.remotePort);
-//  sock.setNoDelay(true);
- 
-  // Add a 'data' event handler to this instance of socket
-  sock.on('data', function(data) {
-    console.log('DATA ' + sock.remoteAddress + ': ' + data);
-    // Write the data back to the socket, the client will receive it as data from the server
-    // sock.write('You said "' + data + '"');
-    var data = JSON.parse(data);
+
+  console.log('CONNECTED: ' + sock.remoteAddress +':'+ sock.remotePort);
+  //  sock.setNoDelay(true);
+
+  async function signUpUser(data){
+    try{
+      var res = await userControl.signupuser(data.body);
+      console.log(res);
+      sock.write(JSON.stringify(res));  
+    }
+    catch(err){
+      var res = {"status": "400", "message": err, data: {}};
+      sock.write(JSON.stringify(res));
+    }
     
-    // console.log(data.Method);
-    if(data.Method == 'POST' && data.Route == '/register')
-    {
-      userControl.register(data.Body).then((res) => {
-        console.log(res);
-        sock.write(JSON.stringify(res));
-      });
+  }
+
+  async function signUpCompany(data){
+    try{
+      var res = await userControl.signupcompany(data.body);
+      console.log(res);
+      sock.write(JSON.stringify(res));
     }
-
-    else if(data.Method == 'GET' && data.Route == '/authenticate')
-    {
-      userControl.authenticate(data.Body).then((res) => {
-        console.log(res);
-        sock.write(JSON.stringify(res));
-      });
+    catch(err){
+      var res = {"status" : "400", "message" : err, data: {}};
+      sock.write(JSON.stringify(res));
     }
+  }
 
-    // const tok = requireLogin(data.token);
-    // if(tok == 0)
-    // {
-    //   return;
-    // }
+  async function loginUser (data){
+    try{
+      var res = await userControl.loginuser(data.body);
+      console.log(res);
+      sock.write(JSON.stringify(res));
+    }
+    catch(err){
+      var res = {"status" : "400", "message" : err, data: {}};
+      sock.write(JSON.stringify(res));
+    }
+  }
 
+  async function loginCompany (data){
+    try{
+      var res = await userControl.logincompany(data.body);
+      console.log(res);
+      sock.write(JSON.stringify(res)); 
+    }
+    catch(err){
+      var res = {"status": "400", "message": err, data: {}};
+      sock.write(JSON.stringify(res));
+    }
+  }
+
+  async function myProfile (data){
+    try{
+      data = data.token.decode(); 
+      const is_company = data.is_company;
+      const id = data.id;
+      var res = await userControl.myprofile({id,is_company});
+      sock.write(JSON.stringify(res));
+    }
+    catch(err){
+      var res = {"status": "400", "message": err, data: {}};
+      sock.write(JSON.stringify(res));
+    }
+  }
+ 
+  sock.on('data', function(data) {
+    // console.log('DATA ' + sock.remoteAddress + ': ' + data);
+    // sock.write('You said "' + data + '"');
+    
+    if(requireLogin(data.token) == 0)
+    {
+      var res = {
+        "message":  "There are 2 types of states available, 1. Login 2. Signup"
+      }
+      sock.write(JSON.stringify(res));
+    }
+    else{
+
+      var data = JSON.parse(data);
+      var command = data.command
+      // console.log(data.Method);
+
+      switch(command){
+        case 'logout' : 
+          logout(data); 
+          break;
+                            
+        case 'loginUser':
+          loginUser(data);
+          break;
+          
+        case 'myProfile' :
+          myProfile(data);
+          break;
+                      
+        case 'loginCompany':
+          loginCompany(data);
+          break;
+
+        case 'signUpUser':  
+          signUpUser(data);
+          break;
+          
+        case 'signUpCompany': 
+          signUpCompany(data);
+          break;
+      }
+
+    }
+  
   });
-  // Add a 'close' event handler to this instance of socket
+  
  sock.on('close', function(data) {
    console.log('CLOSED: ' + sock.remoteAddress +' '+ sock.remotePort);
  });

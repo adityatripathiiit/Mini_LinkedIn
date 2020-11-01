@@ -1,106 +1,139 @@
-// const express = require('express');
-// const router = express.Router();
 const auth = require('./onboarding');
-
-// routes
-// router.post('/authenticate', authenticate);
-// router.post('/register', register);
-// router.get('/', getAll);
-// router.get('/current', getCurrent); 
-// router.get('/:id', getById);
-// router.put('/:id', update); 
-// router.delete('/:id', _delete);
-
-// module.exports = router;
-
 module.exports = {
-    authenticate,
-    getAll,
-    getCurrent,
-    getById,
-    register,
-    update,
-    _delete
+    loginuser,
+    logincompany,
+    signupuser,
+    signupcompany,
+    myprofile,
+
+
 };
 
 
-async function authenticate(req) {
+async function loginuser(req) {
     const email = req.email;
     const password =req.password;
     var res;
     try{
-        const user = await auth.authenticate({email,password});
-        if(user){
-            res = {"status": "200", user}; 
+        const token  = await auth.login_user({email,password});
+        if(token){
+            res = {"status": "200", 'message': 'success', 'data':{'token' : token}}; 
             return res;
         }
         else{
-            res = {"status":"400", 'message': 'Username or password is incorrect' };
+            res = {"status":"400", 'message': 'Username or password is incorrect', data: {} };
+            return res;
+        }
+    }
+    catch(err){
+        console.log(err);
+        res = {"status": "400", 'message': err, data: {}};
+        return res;
+    }
+    
+}
+
+async function logincompany(req) {
+    const email = req.email;
+    const password =req.password;
+    var res;
+    try{
+        const token = await auth.login_company({email,password});
+        if(token){
+            res = {"status": "200", 'message': 'success', 'data':{'token' : token}}; 
+            return res;
+        }
+        else{
+            res = {"status":"400", 'message': 'Username or password is incorrect', dtata: {} };
             return res;
         }
 
     }
     catch(err){
         console.log(err);
-        res = {"status": "400"};
+        res = {"status": "400", 'message': err, data: {}};
         return res;
     }
     
 }
 
-async function register(req){
+async function signupuser(req){
     try{
-        console.log(req);
-        await auth.create(req);
-        res = {"status": "200"};
+        await auth.signup_user(req);
+        res = {"status": "200", 'message': 'Success', data: {}};
         return res;
     }
     catch(err){
         console.log(err);
-        res = {"status": "400"};
-        return res;
-        
+        res = {"status": "400", 'message': err, data: {}};
+        return res; 
     }
 }
 
-function getAll(req, res) {
-    auth.getAll()
-        .then(users => {res.json(users)
-        console.log(res)})
-        .catch(err => next(err));
-}
-
-async function getCurrent(req) {
-
+async function signupcompany(req){
     try{
-        const user =  await auth.getById(req.user.sub);
-        return user; 
+        await auth.signup_company(req);
+        res = {"status": "200", 'message': 'Success', data: {}};
+        return res;
     }
     catch(err){
         console.log(err);
-        res = {"status": "400"};
-        return res;
+        res = {"status": "400", 'message': err, data: {}};
+        return res; 
     }
 }
 
-function getById(req, res, next) {
-    auth.getById(req.params.id)
-        .then(user => user ? res.json(user) : res.sendStatus(404))
-        .catch(err => next(err));
-}
-
-async function update(req) {
+async function myprofile({id, is_company}) {
     try{
-        await auth.update(req.params.id, req.body);
+        const data = await auth.my_profile({id,is_company});
+        res = 
     }
-    catch{
+    catch(err){
+        console.log(err);
+        res = {"status": "400", 'message': err, data: {}};
+        return res; 
+    }
+}
 
-    }
+
+// function getAll(req, res) {
+//     auth.getAll()
+//         .then(users => {res.json(users)
+//         console.log(res)})
+//         .catch(err => next(err));
+// }
+
+// async function getCurrent(req) {
+
+//     try{
+//         const user =  await auth.getById(req.user.sub);
+//         return user; 
+//     }
+//     catch(err){
+//         console.log(err);
+//         res = {"status": "400"};
+//         return res;
+//     }
+// }
+
+// function getById(req, res, next) {
+//     auth.getById(req.params.id)
+//         .then(user => user ? res.json(user) : res.sendStatus(404))
+//         .catch(err => next(err));
+// }
+
+// async function update(req) {
+//     try{
+//         await auth.update(req.params.id, req.body);
+//     }
+//     catch{
+
+//     }
     
-}
+// }
 
-function _delete(req, res, next) {
-    auth.delete(req.params.id)
-        .then(() => res.json({}))
-        .catch(err => next(err));
-}
+// function _delete(req, res, next) {
+//     auth.delete(req.params.id)
+//         .then(() => res.json({}))
+//         .catch(err => next(err));
+// }

@@ -1,33 +1,44 @@
-var net = require('net');
+const net = require('net');
 const jwt = require('jsonwebtoken');
+const commands = require('./commands');
+const prompt = require('prompt');
+
+prompt.start();
+
+const printInitMessage = ()=>{
+  console.log('Welcome to Mini LikendIn. We support following features - ');
+  console.log(JSON.stringify(commands.commandsArray)); 
+};
 
 var HOST = '127.0.0.1';
 var PORT = 6969;
 
 var client = new net.Socket();
-client.connect(PORT, HOST, function() {
-console.log('CONNECTED TO: ' + HOST + ':' + PORT);
-  // Write a message to the socket as soon as the client is connected, the server will receive it as message from the client
-  var data = {'Method': 'GET', 'Route': '/authenticate', "Body":{"password":"Pass", "email":"mail123@mail.com"}, "token": ""};
-  client.write(JSON.stringify(data));
-  
-  
+
+// client.connect(PORT, HOST, function() {
+//     console.log('Connected to the server \n');
+    printInitMessage();
+    while(1){
+        prompt.get(['command'], (error, result)=>{
+            const commandKey = result.command;   
+            const keyFound = commands.commandsArray.hasOwnProperty(commandInput);
+            if(keyFound) {
+              const commandName = commands.commandsArray[commandInput];
+              prompt.get(commands.askForData[commandName], (error, result)=>{
+                  
+              });   
+            }            
+        });
+    }
+// });
+
+
+
+client.on('data', function(data) {  
+  data = JSON.parse(data);  
+  console.log(data);    
 });
 
-// Add a 'data' event handler for the client socket
-// data is what the server sent to this socket
-client.on('data', function(data) {
-  // console.log('Response ' + data);
-  data = JSON.parse(data);
-  // const token = data.user.token;
-  // const temp = jwt.decode(token);
-  
-  // console.log(temp.sub);  
-  // Close the client socket completely
-  client.destroy();
-});
-
-// Add a 'close' event handler for the client socket
 client.on('close', function() {
   console.log('Connection closed');
-});""
+});
