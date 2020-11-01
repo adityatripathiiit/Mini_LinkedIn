@@ -5,19 +5,33 @@ const commandsArray = {
         '3':'signUpUser',
         '4':'signUpCompany',
         '5':'logout',
-        '6':'getMyProfile',
-        '7':'updateProfile'        
+        '6':'getMyProfile', 
+		'7':'updateProfile',
+ 		'8':'deleteAccount',
+		'9':'getMyFeed',
+		'10':'like',
+		'11':'clap',
+		'12':'support',
+		'13':'acceptConnection',
+		'14':'sendConnection',
+		'15':'postJob',
+		'16':'createPost',
+		'17':'searchJob',
+		'18':'feedCompany', 
+		'19':'endorseSkill', 
+		'20':'applyToJob',
+		'21':'viewProfile', 
+		'22':'getJobDetails', 
+
 }
 
 const askForData = {
 	'loginUser':{
 		"properties":{
-			"email":{
-				
-			},
+			"email":{},
 			"password":{
-                                "hidden":true,
-                                "replace": '*'
+						"hidden":true,
+						"replace": '*'
 			}
 		}
 	},
@@ -27,8 +41,8 @@ const askForData = {
 				
 			},
 			"password":{
-                                "hidden":true,
-                                "replace": '*'
+					"hidden":true,
+					"replace": '*'
 			}
 		}
 	},
@@ -45,7 +59,7 @@ const askForData = {
 			},
 			"password":{
 				"hidden":true,
-                                "replace": '*'
+                "replace": '*'
 			}
 		}
 	},

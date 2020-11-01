@@ -113,7 +113,12 @@ var userSchema = new mongoose.Schema({
     ],
     viewedBy: [
         {
-            type: String 
+            id: {
+                type : String
+            },
+            isCompany : {
+                type: Boolean
+            }
         }
     ],
     posts: [

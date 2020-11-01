@@ -6,7 +6,20 @@ module.exports = {
     signupcompany,
     myprofile,
     updateprofile,
-    
+    getmyfeed,
+    createpost,
+    postjob,
+    sendconnection,
+    acceptconnection,
+    searchjob,
+    likepost,
+    clappost,
+    supportpost,
+    applytojob,
+    feedcompany,
+    getjobdetails,
+    endorseskill,
+    viewprofile,
 
 };
 
@@ -113,45 +126,215 @@ async function updateprofile({body, id, is_company}){
     }
 }
 
+async function createpost({body, id}){
+    var res;
+    try{        
+        await auth.create_post({body, id});
+        res = {"status": "200", 'message': 'Successfully created post! ', data: {}};
+        return res;
+    }
+    catch(err){
+        console.log(err);
+        res = {"status": "400", 'message': err, data: {}};
+        return res; 
+    }
+}
 
-// function getAll(req, res) {
-//     auth.getAll()
-//         .then(users => {res.json(users)
-//         console.log(res)})
-//         .catch(err => next(err));
-// }
+async function postjob({body, id}){
+    var res;
+    try{        
+        await auth.post_job({body, id});
+        res = {"status": "200", 'message': 'Successfully posted job! ', data: {}};
+        return res;
+    }
+    catch(err){
+        console.log(err);
+        res = {"status": "400", 'message': err, data: {}};
+        return res; 
+    }
+}
 
-// async function getCurrent(req) {
+async function getmyfeed(id){
+    var res;
+    try{
+        const data = await auth.get_my_feed(id);
+        res = {"status": "200", 'message': "Feed fetched successfully!", data: {feed: data}};
+        return res;
+    }
+    catch(err){
+        console.log(err);
+        res = {"status": "400", 'message': err, data: {}};
+        return res; 
+    }
+}
 
-//     try{
-//         const user =  await auth.getById(req.user.sub);
-//         return user; 
-//     }
-//     catch(err){
-//         console.log(err);
-//         res = {"status": "400"};
-//         return res;
-//     }
-// }
 
-// function getById(req, res, next) {
-//     auth.getById(req.params.id)
-//         .then(user => user ? res.json(user) : res.sendStatus(404))
-//         .catch(err => next(err));
-// }
+async function feedcompany(id){
+    var res;
+    try{
+        const data = await auth.feed_company(id);
+        res = {"status": "200", 'message': "Feed fetched successfully!", data: {feed: data}};
+        return res;
+    }
+    catch(err){
+        console.log(err);
+        res = {"status": "400", 'message': err, data: {}};
+        return res; 
+    }
+}
+async function getmyfeed(id){
+    var res;
+    try{
+        const data = await auth.get_my_feed(id);
+        res = {"status": "200", 'message': "Feed fetched successfully!", data: {feed: data}};
+        return res;
+    }
+    catch(err){
+        console.log(err);
+        res = {"status": "400", 'message': err, data: {}};
+        return res; 
+    }
+}
 
-// async function update(req) {
-//     try{
-//         await auth.update(req.params.id, req.body);
-//     }
-//     catch{
 
-//     }
-    
-// }
 
-// function _delete(req, res, next) {
-//     auth.delete(req.params.id)
-//         .then(() => res.json({}))
-//         .catch(err => next(err));
-// }
+async function sendconnection(fromId, toId){
+    try {
+        const res = await auth.send_connection(fromId, toId);
+        res = {"status": "200", 'message': "Connection sent successfully!", data: {}};
+        return res;
+    } catch(err){
+        console.log(err);
+        res = {"status": "400", 'message': err, data: {}};
+        return res; 
+    }
+}
+
+async function acceptconnection(fromId, toId){
+    try {
+        const res = await auth.accept_connection(fromId, toId);
+        return {"status": "200", 'message': "User added successfully to the network!", data: {}};
+    } catch(err){
+        console.log(err);
+        res = {"status": "400", 'message': err, data: {}};
+        return res; 
+    }
+}
+
+async function searchjob(body){
+    var res;
+    try{
+        var value = await auth.search_job(body);
+        res = {"status": "200", 'message': "Feed fetched successfully!", data: {jobs: value}};
+        return res;
+    }
+    catch(err){
+        console.log(err);
+        res = {"status": "400", 'message': err, data: {}};
+        return res; 
+    }
+}
+
+
+async function likepost(post_id){
+    var res;
+    try{
+        await auth.like_post(post_id);
+        res = {"status": "200", "message": "Successfully liked!", data: {}}
+        return res;
+    }
+    catch(err){
+        console.log(err);
+        res = {"status": "400", 'message': err, data: {}};
+        return res; 
+    }
+}
+
+async function clappost(post_id){
+    var res;
+    try{
+        await auth.clap_post(post_id);
+        res = {"status": "200", "message": "Successfully clapped!", data: {}};
+        return res;
+    }
+    catch(err){
+        console.log(err);
+        res = {"status": "400", 'message': err, data: {}};
+        return res; 
+    }
+}
+async function supportpost(post_id){
+    var res;
+    try{
+        await auth.support_post(post_id);
+        res = {"status": "200", "message": "Successfully supported!", data: {}};
+        return res;
+    }
+    catch(err){
+        console.log(err);
+        res = {"status": "400", 'message': err, data: {}};
+        return res; 
+    }
+}
+
+async function applytojob(body){
+    var res;
+    try{
+        await auth.apply_to_job(body);
+        res = {"status": "200", "message": "Successfully applied to job!", data: {}};
+        return res;
+    }
+    catch(err){
+        console.log(err);
+        res = {"status": "400", 'message': err, data: {}};
+        return res; 
+    }
+}
+
+
+
+async function getjobdetails(job_id){
+    var res;
+    try{
+        var data = await auth.get_job_details(job_id);
+        res = {"status": "200", "message": "Successfully fectched job data!", data: {jobDetail:data}};
+        return res;
+    }
+    catch(err){
+        console.log(err);
+        res = {"status": "400", 'message': err, data: {}};
+        return res; 
+    }
+}
+
+async function endorseskill({user_id,endourse_id, skill_index}){
+    var res;
+    try{
+        const valid = await auth.endorse_skill({user_id,endourse_id, skill_index});
+        if(valid ==0){
+            res = {"status": "400", 'message': "already endorsed, chill out", data: {}};
+            return res;
+        }
+        res = {"status": "200", "message": "Successfully endoursed user!", data: {}};
+        return res;
+    }
+    catch(err){
+        console.log(err);
+        res = {"status": "400", 'message': err, data: {}};
+        return res; 
+    }
+}
+
+async function viewprofile(whoseId, isCompany){
+    var res;
+    try{
+        var data = await auth.view_profile(whoseId, isCompany);
+        res = {"status": "200", "message": "Successfully fectched profile!", data: data};
+        return res;
+    }
+    catch(err){
+        console.log(err);
+        res = {"status": "400", 'message': err, data: {}};
+        return res; 
+    }
+}
