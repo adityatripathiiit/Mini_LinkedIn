@@ -9,6 +9,8 @@ module.exports = {
     login_company,
     signup_user,
     signup_company,
+    my_profile,
+    update_profile,
     
 };
 
@@ -37,7 +39,6 @@ async function login_company({ email, password }) {
          throw(err);
     }
 }
-
 
 
 // async function getAll() {
@@ -80,27 +81,41 @@ async function signup_company(companyParam) {
     }
 }
 
-// async function update(id, userParam) {
-//     const user = await User.findById(id);
+async function my_profile({id, is_company}){
+    try{
+        if(is_company){
+            const company = await Company.findById(id);
+            return company;
+        }
+        else{
+            const user = await User.findById(id);
+            return user;
+        }
+    }
+    catch(err){
+        throw(err);
+    }
+}
 
-//     // validate
-//     if (!user) throw('User not found');
-//     // if (user.email !== userParam.email && await User.findOne({ email: userParam.email })) {
-//     //     throw 'email "' + userParam.email + '" is already taken';
-//     // }
+async function update_profile({body, id, is_company}) {
+    try{
+        if(is_company){
+            const company = await Company.findById(id);
+            Object.assign(company,body)
+            await company.save(); 
+    
+        }
+        else{
+            const user = await User.find(id);
+            Object.assign(user,body);
+            await user.save();
+        }
+    }
+    catch(err){
+        throw(err); 
+    }
+}
 
-//     // hash password if it was entered
-//     if (userParam.password) {
-//         userParam.password = bcrypt.hashSync(userParam.password, 10);
-//     }
-
-//     // copy userParam properties to user
-//     Object.assign(user, userParam);
-
-//     await user.save();
-//     console.log("User created successfully");
-// }
-
-// async function _delete(id) {
-//     await User.findByIdAndRemove(id);
-// }
+async function _delete(id) {
+    await User.findByIdAndRemove(id);
+}

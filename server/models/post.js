@@ -1,9 +1,6 @@
 const mongoose = require('mongoose');
 
-var postSchema = mongoose.Schema({
-    _id : {
-      type: String
-    },
+var postSchema = new mongoose.Schema({
     postById : {
         type : String,
         required : true
@@ -32,11 +29,7 @@ var postSchema = mongoose.Schema({
             type: String
         }
     ]    
-},{
-    timestamps: {
-        createdAt: 'created_at',
-        updatedAt: 'updated_at'
-    }
+
 });
 
 module.exports =  mongoose.model('post', postSchema)

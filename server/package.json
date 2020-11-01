@@ -7,7 +7,8 @@
     "bcrypt": "^5.0.0",
     "bcryptjs": "^2.4.3",
     "express-jwt": "^6.0.0",
-    "mongoose": "^5.10.11"
+    "mongoose": "^5.10.11",
+    "mongoose-timestamp": "^0.6.0"
   },
   "devDependencies": {},
   "scripts": {

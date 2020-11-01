@@ -1,10 +1,7 @@
 var mongoose = require('mongoose');
 
-var jobPostings = mongoose.Schema({
-    _id : {
-        type: String,
-        required :true
-    },  
+var jobPostings = new mongoose.Schema({
+    
     companyName : {
         type : String, 
         required: true
@@ -82,7 +79,8 @@ var jobPostings = mongoose.Schema({
             }
         }
     ]
-},{
+}
+,{
     timestamps: 
         { 
             createdAt: 'created_at', 

@@ -5,7 +5,8 @@ module.exports = {
     signupuser,
     signupcompany,
     myprofile,
-
+    updateprofile,
+    
 
 };
 
@@ -58,6 +59,7 @@ async function logincompany(req) {
 }
 
 async function signupuser(req){
+    var res;
     try{
         await auth.signup_user(req);
         res = {"status": "200", 'message': 'Success', data: {}};
@@ -71,6 +73,7 @@ async function signupuser(req){
 }
 
 async function signupcompany(req){
+    var res;
     try{
         await auth.signup_company(req);
         res = {"status": "200", 'message': 'Success', data: {}};
@@ -84,9 +87,24 @@ async function signupcompany(req){
 }
 
 async function myprofile({id, is_company}) {
+    var res;
     try{
         const data = await auth.my_profile({id,is_company});
-        res = 
+        res = {"status": "200", 'message': 'Success', data: {profile:data}};
+    }
+    catch(err){
+        console.log(err);
+        res = {"status": "400", 'message': err, data: {}};
+        return res; 
+    }
+}
+
+async function updateprofile({body, id, is_company}){
+    var res;
+    try{
+        await auth.update_profile({body, id, is_company});
+        res = {"status": "200", 'message': 'Successfully updated profile! ', data: {}};
+        return res;
     }
     catch(err){
         console.log(err);

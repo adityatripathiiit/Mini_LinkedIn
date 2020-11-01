@@ -1,10 +1,6 @@
 const mongoose = require('mongoose');
 
-var companySchema = mongoose.Schema({
-    _id : {
-      type: String,
-      required: true
-    },
+var companySchema = new mongoose.Schema({
     companyName : {
         type : String,
         required : true
@@ -18,7 +14,7 @@ var companySchema = mongoose.Schema({
         required : true
     },
     description: {
-        type: Strig,
+        type: String,
         required: true
     },
     address : {

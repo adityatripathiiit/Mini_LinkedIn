@@ -1,9 +1,6 @@
 const mongoose = require('mongoose');
 
-var userSchema = mongoose.Schema({
-    _id : {
-      type: String
-    },
+var userSchema = new mongoose.Schema({
     firstName : {
         type : String,
         required : true
@@ -102,11 +99,11 @@ var userSchema = mongoose.Schema({
             }
          }
     ],
-    applieadToJobs: [
+    appliedToJobs: [
         {
             companyId: {
                 type:String,
-                required:true
+                required: true
             },
             appliedAt:{
                 type: Date,
@@ -116,8 +113,7 @@ var userSchema = mongoose.Schema({
     ],
     viewedBy: [
         {
-            userId: String,
-            required: true
+            type: String 
         }
     ],
     posts: [

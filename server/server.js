@@ -11,7 +11,6 @@ const connectMongo = require('./db/db');
 
 connectMongo();
 
-
 function requireLogin(token){
   try{
     if(token){
@@ -28,7 +27,6 @@ function requireLogin(token){
 net.createServer(function(sock) {
 
   console.log('CONNECTED: ' + sock.remoteAddress +':'+ sock.remotePort);
-  //  sock.setNoDelay(true);
 
   async function signUpUser(data){
     try{
@@ -92,50 +90,81 @@ net.createServer(function(sock) {
       sock.write(JSON.stringify(res));
     }
   }
- 
-  sock.on('data', function(data) {
-    // console.log('DATA ' + sock.remoteAddress + ': ' + data);
-    // sock.write('You said "' + data + '"');
-    
-    if(requireLogin(data.token) == 0)
-    {
-      var res = {
-        "message":  "There are 2 types of states available, 1. Login 2. Signup"
-      }
+
+  async function logout(){
+    try{
+      var res = {"status": "200", "message": "Successfully logged out!", data: {"token": ""}};
       sock.write(JSON.stringify(res));
     }
-    else{
+    catch(err){
+      var res = {"status": "400", "message": err, data: {}};
+      sock.write(JSON.stringify(res));
+    }
+  }
 
-      var data = JSON.parse(data);
-      var command = data.command
-      // console.log(data.Method);
-
-      switch(command){
-        case 'logout' : 
-          logout(data); 
-          break;
-                            
-        case 'loginUser':
-          loginUser(data);
-          break;
+  async function updateProfile(data){
+    try{
+      const token = data.token.decode(); 
+      const is_company = token.is_company;
+      const id = token.id;
+      const body = data.body; 
+      var res = await userControl.updateprofile({ body, id, is_company });
+      sock.write(JSON.stringify(res));
+    }
+    catch(err){
+      var res = {"status": "400", "message": err, data: {}};
+      sock.write(JSON.stringify(res));
+    }
+  }
+  
+  sock.on('data', function(data) {
+    
+    data = JSON.parse(data);
+    console.log(data);
+    if(data.command == 'loginUser'){
+      loginUser(data);
+    }
+    else if (data.command == 'loginUser'){
+      loginCompany(data);
+    }
+    
+    else if (data.command == 'signUpUser'){
+      signUpUser(data);
+    }
           
-        case 'myProfile' :
-          myProfile(data);
-          break;
-                      
-        case 'loginCompany':
-          loginCompany(data);
-          break;
-
-        case 'signUpUser':  
-          signUpUser(data);
-          break;
-          
-        case 'signUpCompany': 
-          signUpCompany(data);
-          break;
+    else if (data.command == 'signUpCompany'){
+       signUpCompany(data);
       }
+    else {
 
+      
+      if(requireLogin(data.token) == 0)
+      {
+        var res = {
+          "message":  "There are 2 types of states available, 1. Login 2. Signup"
+        }
+        sock.write(JSON.stringify(res));
+      }
+      else{
+
+        var data = JSON.parse(data);
+        var command = data.command
+        // console.log(data.Method);
+        switch(command){
+          case 'logout' : 
+            logout(); 
+            break;                  
+            
+          case 'myProfile' :
+            myProfile(data);
+            break;
+                        
+          case 'updateProfile': 
+            updateProfile(data);
+            break;
+        }
+
+      }
     }
   
   });

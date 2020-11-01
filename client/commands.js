@@ -10,13 +10,68 @@ const commandsArray = {
 }
 
 const askForData = {
-        '1':["email","password"],
-        '2':["email","password"],
-        '3':["firstName","lastName","email","password"],
-        '4':["companyName","description","address","email","password"],
-        '5':[],
-        '6':[],
-        '7':[],
+	'loginUser':{
+		"properties":{
+			"email":{
+				
+			},
+			"password":{
+                                "hidden":true,
+                                "replace": '*'
+			}
+		}
+	},
+	'loginCompany':{
+		"properties":{
+			"email":{
+				
+			},
+			"password":{
+                                "hidden":true,
+                                "replace": '*'
+			}
+		}
+	},
+	'signUpUser':{
+		"properties":{
+			"firstName":{
+				
+			},
+			"lastName":{
+				
+			},
+			"email":{
+				
+			},
+			"password":{
+				"hidden":true,
+                                "replace": '*'
+			}
+		}
+	},
+	'signUpCompany':{
+		"properties":{
+			"companyName":{
+				
+			},
+			"description":{
+				
+			},
+			"address":{
+				
+			},
+			"email":{
+				
+			},
+			"password":{
+				"hidden":true,
+                                "replace": '*'
+			}
+		}
+	},
+	'logout':{},
+	'getMyProfile':{},
+	'updateProfile':{}
 }
 
 module.exports.commandsArray = commandsArray;      
