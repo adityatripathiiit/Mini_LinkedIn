@@ -8,6 +8,16 @@ const printInitMessage = ()=>{
   console.log(JSON.stringify(commands.commandsArray)); 
 };
 
+const clientState = {
+    "sendConnection":{       
+       "data":null
+    },    
+    // feed etc.    
+};
+
+var previousResponseData = null;
+var lastCommandSent = null;
+
 var HOST = '127.0.0.1';
 var PORT = 6969;
 
@@ -18,6 +28,7 @@ var client = new net.Socket();
 client.connect(PORT, HOST, function() {
   printInitMessage();
   const data = {"command": "", "body":"","token":clientToken};
+    
   client.write(JSON.stringify(data));
 });
 
@@ -39,9 +50,36 @@ async function takeInput(){
     }
           
     const commandName = commands.commandsArray[commandKey];
-    var data = await prompt.get(commands.askForData[commandName]); 
 
-    data = {'command': commandName , 'body':data, 'token':''};
+    const askInput = true;    
+
+    // reset all others to null
+    for(const prop in clientState){
+      if(clientState[prop] != clientState[commandName]){
+        clientState[prop].data = null;
+      } else {
+        if(clientState[prop].data==null){
+
+        } else {
+
+        }
+      }
+    }
+
+
+    var data = {};
+
+    if(askInput && commands.askForData[commandName]){      
+        data = await prompt.get(commands.askForData[commandName]); 
+        
+        // if(clientState[commandName]){
+        //   data = {...data, "status":clientState[commandName].status};
+        // }
+    }     
+
+
+
+    data = {'command': commandName , 'body':data, 'token':clientToken};
 
     return data;
 
@@ -49,9 +87,17 @@ async function takeInput(){
 
 
 client.on('data', async function(data) {    
-  data = JSON.parse(data);   
+  data = JSON.parse(data);  
+    
+  Object.assign(previousResponseData, data); 
 
-  console.log('Data from server is - \n'+JSON.stringify(data)+'\n');    
+  console.log('Data from server is - \n')
+  console.log(data);    
+
+
+  if(data.data.token != null){
+    clientToken = data.data.token; 
+  }
   
   var dataToSend = null;
   while(!dataToSend){
@@ -62,7 +108,8 @@ client.on('data', async function(data) {
      }
   }        
 
-  console.log('Sending this data - \n'+JSON.stringify(dataToSend)+'\n');
+  console.log('Sending this data - \n');
+  console.log(dataToSend);
   client.write(JSON.stringify(dataToSend));
 
 });

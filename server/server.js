@@ -10,10 +10,11 @@ const connectMongo = require('./db/db');
 
 connectMongo();
 
-function requireLogin(token){
+async function requireLogin(token){
   try{
     if(token){
-      return jwt.verify(token, config.secret);
+      await jwt.verify(token, config.secret);
+      return 1;
     }
     return 0; 
   }catch(err)
@@ -76,9 +77,9 @@ net.createServer(function(sock) {
     }
   }
 
-  async function myProfile (data){
+  async function getMyProfile (data){
     try{
-      data = data.token.decode(); 
+      data = jwt.decode(data.token); 
       const is_company = data.is_company;
       const id = data.id;
       var res = await userControl.myprofile({id,is_company});
@@ -103,7 +104,7 @@ net.createServer(function(sock) {
 
   async function updateProfile(data){
     try{
-      const token = data.token.decode(); 
+      const token = jwt.decode(data.token); 
       const is_company = token.is_company;
       const id = token.id;
       const body = data.body; 
@@ -118,7 +119,7 @@ net.createServer(function(sock) {
 
   async function createPost(data){
     try{
-      const token = data.token.decode(); 
+      const token = jwt.decode(data.token); 
         const id = token.id;
         const body = data.body; 
         var res = await userControl.createpost({ body, id});
@@ -132,7 +133,7 @@ net.createServer(function(sock) {
 
   async function postJob(data){
     try{
-      const token = data.token.decode(); 
+      const token = jwt.decode(data.token); 
         const id = token.id;
         const body = data.body; 
         var res = await userControl.postjob({ body, id});
@@ -146,7 +147,7 @@ net.createServer(function(sock) {
 
   async function getMyFeed(){
     try{
-      const token = data.token.decode(); 
+      const token = jwt.decode(data.token); 
       const id = token.id; 
       var res = await userControl.getmyfeed(id);
       sock.write(JSON.stringify(res));
@@ -158,9 +159,9 @@ net.createServer(function(sock) {
     }
   }
 
-  async function feedCompany(){
+  async function feedCompany(data){
     try{
-      const token = data.token.decode(); 
+      const token = jwt.decode(data.token); 
       const id = token.id; 
       var res = await userControl.feedcompany(id);
       sock.write(JSON.stringify(res));
@@ -174,11 +175,18 @@ net.createServer(function(sock) {
 
   async function sendConnection(data){
      try {
-        var fromId = data.tocken.decode().id;
-        var toId = data.userId;
-        var userToConnectId = data.userId;
-        var res = await userControl.sendconnection(fromId, toId);
-        sock.write(JSON.stringify(res));
+        var index= data.body.index; 
+        var fromId = jwt.decode(data.token).id;
+        var toId = data.body.userId;
+        if(index == -1){
+          var res = await userControl.getallusers();
+          sock.write(JSON.stringify(res));
+        }
+        else{
+          var res = await userControl.sendconnection(fromId, toId);
+          sock.write(JSON.stringify(res));
+        }
+        
      } catch(err){
         var res = {"status":"400", "message":err, data:{}};
         sock.write(JSON.stringify(res));
@@ -187,7 +195,7 @@ net.createServer(function(sock) {
 
   async function acceptConnection(data){
     try {
-      var fromId = data.tocken.decode().id;
+      var fromId = jwt.decode(data.tocken).id;
       var toId = data.userId;
       var res = await userControl.acceptconnection(fromId, toId);
       sock.write(JSON.stringify(res));
@@ -212,9 +220,17 @@ net.createServer(function(sock) {
 
   async function like(data){
     try{
-      var res = await userControl.likepost(data.body);
-      sock.write(JSON.stringify(res));
-
+      var index= data.body.index; 
+      var fromId = jwt.decode(data.token).id;
+      var toPostId = data.body.postId;
+      if(index == -1){
+        var res = await userControl.getallposts();
+        sock.write(JSON.stringify(res));
+      }
+      else{
+        var res = await userControl.likepost({fromId, toPostId});
+        sock.write(JSON.stringify(res));
+      }
     }
     catch(err){
       var res = {"status": "400", "message": err, data: {}};
@@ -260,7 +276,7 @@ net.createServer(function(sock) {
   async function endorseSkill(data){
     try{
       var body = data.body;
-      var user_id = data.tocken.decode().id;
+      var user_id = jwt.decode(data.tocken).id;
       var endourse_id = data.user_id ;
       var skill_index = data.skill_index; 
       var res = await userControl.endorseskill({user_id,endourse_id, skill_index});
@@ -284,12 +300,28 @@ net.createServer(function(sock) {
     }
   }
 
-  async function viewProfile(data, isCompany){
+  async function viewProfile(data, is_company){
     try {
       var whoseId = data.body.whoseId;
-      var res = await userControl.viewprofile(whoseId, isCompany);
+      var res = await userControl.viewprofile(whoseId, is_company);
       sock.write(JSON.stringify(res));
     } catch(err){
+      var res = {"status": "400", "message": err, data: {}};
+      sock.write(JSON.stringify(res));
+    }
+  }
+
+  
+
+  async function deleteAccount (data){
+    try{
+      data = jwt.decode(data.token); 
+      const is_company = data.is_company;
+      const id = data.id;
+      var res = await userControl.deleteaccount({id,is_company});
+      sock.write(JSON.stringify(res));
+    }
+    catch(err){
       var res = {"status": "400", "message": err, data: {}};
       sock.write(JSON.stringify(res));
     }
@@ -303,38 +335,38 @@ net.createServer(function(sock) {
   }
 
 
-  sock.on('data', function(data) {
+  sock.on('data', async function(data) {
     
     data = JSON.parse(data);
     console.log(data);
     if(data.command == 'loginUser'){
       loginUser(data);
-    } else if (data.command == 'loginCompany'){
+    } 
+    else if (data.command == 'loginCompany'){
       loginCompany(data);
-    } else if (data.command == 'signUpUser'){
+    } 
+    else if (data.command == 'signUpUser'){
       signUpUser(data);
-    } else if (data.command == 'signUpCompany'){
+    } 
+    else if (data.command == 'signUpCompany'){
        signUpCompany(data);
     }
     else {
       
-      if(requireLogin(data.token) == 0){
-        var res = {
-          "message":  "You are not logged in to perform this command."
-        }
+      if(await requireLogin(data.token) == 0){
+        var res = {"status": "400", "message":  "You are not logged in to perform this command.", data: {}};
+        console.log(res);
         sock.write(JSON.stringify(res));
       } else{
 
-        var data = JSON.parse(data);
         var command = data.command
-        var token = data.token.decode();
+        var token = jwt.decode(data.token);
         var is_company = token.is_company;
         var id = token.id;
         
         if(is_company){   
 
           switch(command){
-
             case 'logout' : 
               logout(); 
               break;    
@@ -343,7 +375,7 @@ net.createServer(function(sock) {
               postJob(data);
               break;
             case 'feedCompany':
-              feedCompany();
+              feedCompany(data);
               break; 
             case 'getJobDetails':
               getJobDetails(data);
@@ -351,6 +383,15 @@ net.createServer(function(sock) {
             case 'viewProfile':
               viewProfile(data, true);
               break;
+
+            case 'getMyProfile' :
+              getMyProfile(data);
+              break;
+
+            case 'deleteAccount' :
+              deleteAccount(data);
+              break;
+                
             default:
               invalidCommand();
               break;
@@ -362,8 +403,8 @@ net.createServer(function(sock) {
             logout(); 
             break;                  
             
-          case 'myProfile' :
-            myProfile(data);
+          case 'getMyProfile' :
+            getMyProfile(data);
             break;
                         
           case 'updateProfile': 
@@ -410,6 +451,10 @@ net.createServer(function(sock) {
           case 'viewProfile':
               viewProfile(data, false);
               break;
+          case 'deleteAccount' :
+            deleteAccount(data);
+            break;
+
           default:
               invalidCommand();
               break;

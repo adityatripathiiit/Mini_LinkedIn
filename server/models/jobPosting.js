@@ -35,10 +35,6 @@ var jobPostings = new mongoose.Schema({
         type : String, 
         required: true
     },
-    postingDate : {
-        type : Date, 
-        required: true
-    },
     employmentType : {
         type : String, 
         required: true 
@@ -58,8 +54,7 @@ var jobPostings = new mongoose.Schema({
     },    
     isActive:{
         type : Boolean, 
-        default : false, 
-        required : true
+        default : true,         
     },
     skillSet: [
         {

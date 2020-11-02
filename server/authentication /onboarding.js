@@ -5,6 +5,7 @@ const Company = require('../models/company');
 const Post = require('../models/post'); 
 const Job = require('../models/jobPosting'); 
 const config = require('../config.json');
+const jobPosting = require('../models/jobPosting');
 
 module.exports = {
     login_user,
@@ -24,7 +25,13 @@ module.exports = {
     get_job_details,
     view_profile,
     endorse_skill,
-    
+    delete_account,
+    get_all_users,
+    get_all_posts,
+    like_post,
+    clap_post,
+    support_post
+
 };
 
 function sortBy(field) {
@@ -38,7 +45,8 @@ async function login_user({ email, password }) {
     try{
         const user = await User.findOne({ email });
         if (user && bcrypt.compareSync(password, user.password)) {
-            const token = jwt.sign({ id: user._id, isCompany: false }, config.secret, { expiresIn: '30d' });
+            var is_company = false;
+            const token = jwt.sign({ id: user._id, is_company }, config.secret, { expiresIn: '30d' });
             return token;
         }
     }
@@ -51,7 +59,8 @@ async function login_company({ email, password }) {
     try{
         const company = await Company.findOne({ email });
         if (company && bcrypt.compareSync(password, company.password)) {
-            const token = jwt.sign({ id: company._id, isCompany: true }, config.secret, { expiresIn: '30d' });
+            var is_company = true; 
+            const token = jwt.sign({ id: company._id, is_company }, config.secret, { expiresIn: '30d' });
             return token;
         }
     }
@@ -82,7 +91,7 @@ async function signup_company(companyParam) {
         if (await Company.findOne({ email: companyParam.email })) {
             throw ('An account is already registered on the Email: ' + companyParam.email );
         }
-        const company  = new Company(userParam);
+        const company  = new Company(companyParam);
         if (companyParam.password) {
             company.password = bcrypt.hashSync(companyParam.password, 10);
         }
@@ -143,7 +152,8 @@ async function create_post({body, id}) {
         
         var post_id = val._id;
         const user = await User.findById(id);        
-        user.posts.push({post_id, posted_at});        
+        const payload = {postId: post_id, postedAt: posted_at};
+        user.posts.push(payload);
         await user.save();
     }
     catch(err){
@@ -204,12 +214,13 @@ async function get_my_feed(id){
 async function feed_company(id){
     try{
         var is_company = true;
-        var jobsPosted = await my_profile({ id, is_company }).jobsPosted; 
+        var job = await my_profile({ id, is_company }); 
+        var jobsPosted = job.jobsPosted;
         var i; 
         var feed = [];
         for(i=0; i<jobsPosted.length;i++){
             var jobId = jobsPosted[i]; 
-            var jobData = await get_job_details({ jobId }); 
+            var jobData = await get_job_details(jobId); 
 
             feed.push(jobData);
         }
@@ -304,11 +315,11 @@ async function apply_to_job({body, id}){
         }
 
         const applied_at = new Date();
-        applied_job.applicants.push({user_id, applied_at});
+        applied_job.applicants.push({userId: user_id, appliedAt: applied_at});
         await applied_job.save();
 
         const user = await User.findById(user_id);
-        user.appliedToJobs.push({company_id, applied_at});
+        user.appliedToJobs.push({companyId: company_id, appliedAt: applied_at});
         await user.save();
 
     }
@@ -349,6 +360,93 @@ async function view_profile(whoseId, isCompany){
         user.viewedBy.push({whoseId, isCompany})                        
         return user;
     } catch(err){
+        throw(err);
+    }
+}
+
+async function delete_account({id, is_company}){
+    try{
+        if(is_company){
+            await Company.findByIdAndDelete(id);
+        }
+        else{
+            await User.findByIdAndDelete(id);
+        }
+    }
+    catch(err){
+        throw(err);
+    }
+}
+
+async function get_all_users(){
+    try{
+       var res = [];
+       res = await User.find({}, {
+        "_id": 1,
+        "firstName": 1,
+        "lastName":1,
+      });
+      console.log(res);
+      return res;
+    }
+    catch(err){
+        throw(err);
+    }
+}
+
+async function get_all_posts(){
+    try{
+        var res = [];
+        res = await Post.find();
+        return res;
+    }
+    catch(err){
+        throw(err);
+    }
+}
+
+async function like_post({fromId, toPostId}){
+    try{
+        var post = await Post.findById(toPostId);
+        if(post.includes(fromId)){
+            return 0; 
+        }
+        post.likes.push(fromId);
+        await post.save ();
+        return 1;
+    }
+    catch(err){
+        throw(err);
+    }
+}
+
+
+async function clap_post({fromId, toPostId}){
+    try{
+        var post = await Post.findById(toPostId);
+        if(post.includes(fromId)){
+            return 0; 
+        }
+        post.claps.push(fromId);
+        await post.save ();
+        return 1;
+    }
+    catch(err){
+        throw(err);
+    }
+}
+
+async function support_post({fromId, toPostId}){
+    try{
+        var post = await Post.findById(toPostId);
+        if(post.includes(fromId)){
+            return 0; 
+        }
+        post.supports.push(fromId);
+        await post.save ();
+        return 1;
+    }
+    catch(err){
         throw(err);
     }
 }

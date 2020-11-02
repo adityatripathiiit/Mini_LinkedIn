@@ -20,6 +20,9 @@ module.exports = {
     getjobdetails,
     endorseskill,
     viewprofile,
+    deleteaccount,
+    getallusers,
+    getallposts,
 
 };
 
@@ -58,7 +61,7 @@ async function logincompany(req) {
             return res;
         }
         else{
-            res = {"status":"400", 'message': 'Username or password is incorrect', dtata: {} };
+            res = {"status":"400", 'message': 'Username or password is incorrect', data: {} };
             return res;
         }
 
@@ -104,6 +107,7 @@ async function myprofile({id, is_company}) {
     try{
         const data = await auth.my_profile({id,is_company});
         res = {"status": "200", 'message': 'Success', data: {profile:data}};
+        return res;
     }
     catch(err){
         console.log(err);
@@ -236,11 +240,16 @@ async function searchjob(body){
 }
 
 
-async function likepost(post_id){
+async function likepost({fromId, toPostId}){
     var res;
     try{
-        await auth.like_post(post_id);
-        res = {"status": "200", "message": "Successfully liked!", data: {}}
+        var isValid = await auth.like_post({fromId, toPostId});
+        if(isValid){
+            res = {"status": "200", "message": "Successfully liked!", data: {}};
+        }
+        else {
+            res = {"status": "300", "message": "Already liked!", data: {}};
+        }
         return res;
     }
     catch(err){
@@ -250,11 +259,16 @@ async function likepost(post_id){
     }
 }
 
-async function clappost(post_id){
+async function clappost({fromId, toPostId}){
     var res;
     try{
-        await auth.clap_post(post_id);
-        res = {"status": "200", "message": "Successfully clapped!", data: {}};
+        var isValid = await auth.clap_post({fromId, toPostId});
+        if(isValid){
+            res = {"status": "200", "message": "Successfully clapped!", data: {}};
+        }
+        else {
+            res = {"status": "300", "message": "Already clapped!", data: {}};
+        }
         return res;
     }
     catch(err){
@@ -263,11 +277,16 @@ async function clappost(post_id){
         return res; 
     }
 }
-async function supportpost(post_id){
+async function supportpost({fromId, toPostId}){
     var res;
     try{
-        await auth.support_post(post_id);
-        res = {"status": "200", "message": "Successfully supported!", data: {}};
+        var isValid = await auth.support_post({fromId, toPostId});
+        if(isValid){
+            res = {"status": "200", "message": "Successfully supported!", data: {}};
+        }
+        else {
+            res = {"status": "300", "message": "Already supported!", data: {}};
+        }
         return res;
     }
     catch(err){
@@ -337,4 +356,45 @@ async function viewprofile(whoseId, isCompany){
         res = {"status": "400", 'message': err, data: {}};
         return res; 
     }
+}
+
+async function deleteaccount({id, is_company}) {
+    var res;
+    try{
+        await auth.delete_account({id,is_company});
+        res = {"status": "200", 'message': 'Successfully deleted Account', data: {'token': ""}};
+        return res;
+    }
+    catch(err){
+        console.log(err);
+        res = {"status": "400", 'message': err, data: {}};
+        return res; 
+    }
+}
+
+async function getallusers(){
+    try{
+        var connections  = await auth.get_all_users();
+        res = {"status": "200", 'message': 'successfully fetched all users', 'data':{'connections' : connections}}; 
+        return res;
+    }
+    catch(err){
+        console.log(err);
+        res = {"status": "400", 'message': err, data: {}};
+        return res;
+    }
+    
+}
+async function getallposts(){
+    try{
+        var posts  = await auth.get_all_posts();
+        res = {"status": "200", 'message': 'successfully fetched all users', 'data':{'posts' : posts}}; 
+        return res;
+    }
+    catch(err){
+        console.log(err);
+        res = {"status": "400", 'message': err, data: {}};
+        return res;
+    }
+    
 }
