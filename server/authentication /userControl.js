@@ -22,7 +22,8 @@ module.exports = {
     viewprofile,
     deleteaccount,
     getallusers,
-    getallposts,
+    // getallconnectionsposts,
+    getallpendingconnections,
 
 };
 
@@ -77,8 +78,12 @@ async function logincompany(req) {
 async function signupuser(req){
     var res;
     try{
-        await auth.signup_user(req);
-        res = {"status": "200", 'message': 'Success', data: {}};
+        const isValid = await auth.signup_user(req);
+        if(isValid == 0){
+            res = {"status": "200", 'message': 'User already exists, please sign in', data: {}};    
+            return res; 
+        }
+        res = {"status": "200", 'message': 'Account sucessfully created', data: {}};
         return res;
     }
     catch(err){
@@ -91,8 +96,12 @@ async function signupuser(req){
 async function signupcompany(req){
     var res;
     try{
-        await auth.signup_company(req);
-        res = {"status": "200", 'message': 'Success', data: {}};
+        const isValid = await auth.signup_company(req);
+        if(isValid ==0){
+            res = {"status": "200", 'message': 'company already exists, please sign in', data: {}};    
+            return res; 
+        }
+        res = {"status": "200", 'message': 'Account sucessfully created', data: {}};
         return res;
     }
     catch(err){
@@ -106,7 +115,7 @@ async function myprofile({id, is_company}) {
     var res;
     try{
         const data = await auth.my_profile({id,is_company});
-        res = {"status": "200", 'message': 'Success', data: {profile:data}};
+        res = {"status": "200", 'message': 'Success', data:data};
         return res;
     }
     catch(err){
@@ -162,7 +171,7 @@ async function getmyfeed(id){
     var res;
     try{
         const data = await auth.get_my_feed(id);
-        res = {"status": "200", 'message': "Feed fetched successfully!", data: {feed: data}};
+        res = {"status": "200", 'message': "Feed fetched successfully!", data:data};
         return res;
     }
     catch(err){
@@ -177,7 +186,7 @@ async function feedcompany(id){
     var res;
     try{
         const data = await auth.feed_company(id);
-        res = {"status": "200", 'message': "Feed fetched successfully!", data: {feed: data}};
+        res = {"status": "200", 'message': "Feed fetched successfully!", data: data};
         return res;
     }
     catch(err){
@@ -190,7 +199,7 @@ async function getmyfeed(id){
     var res;
     try{
         const data = await auth.get_my_feed(id);
-        res = {"status": "200", 'message': "Feed fetched successfully!", data: {feed: data}};
+        res = {"status": "200", 'message': "Feed fetched successfully!", data: data };
         return res;
     }
     catch(err){
@@ -204,7 +213,7 @@ async function getmyfeed(id){
 
 async function sendconnection(fromId, toId){
     try {
-        const res = await auth.send_connection(fromId, toId);
+        var res = await auth.send_connection(fromId, toId);
         res = {"status": "200", 'message': "Connection sent successfully!", data: {}};
         return res;
     } catch(err){
@@ -216,7 +225,7 @@ async function sendconnection(fromId, toId){
 
 async function acceptconnection(fromId, toId){
     try {
-        const res = await auth.accept_connection(fromId, toId);
+        await auth.accept_connection(fromId, toId);
         return {"status": "200", 'message': "User added successfully to the network!", data: {}};
     } catch(err){
         console.log(err);
@@ -229,7 +238,7 @@ async function searchjob(body){
     var res;
     try{
         var value = await auth.search_job(body);
-        res = {"status": "200", 'message': "Feed fetched successfully!", data: {jobs: value}};
+        res = {"status": "200", 'message': "Feed fetched successfully!", data: value};
         return res;
     }
     catch(err){
@@ -375,7 +384,7 @@ async function deleteaccount({id, is_company}) {
 async function getallusers(){
     try{
         var connections  = await auth.get_all_users();
-        res = {"status": "200", 'message': 'successfully fetched all users', 'data':{'connections' : connections}}; 
+        res = {"status": "200", 'message': 'successfully fetched all users', 'data':connections}; 
         return res;
     }
     catch(err){
@@ -385,10 +394,26 @@ async function getallusers(){
     }
     
 }
-async function getallposts(){
+// async function getallconnectionsposts(userId){
+//     try{
+//         var posts  = await auth.get_all_connections_posts(userId);
+//         res = {"status": "200", 'message': 'successfully fetched all posts of connections', 'data':posts}; 
+//         return res;
+//     }
+//     catch(err){
+//         console.log(err);
+//         res = {"status": "400", 'message': err, data: {}};
+//         return res;
+//     }
+    
+// }
+
+
+async function getallpendingconnections(userId){
     try{
-        var posts  = await auth.get_all_posts();
-        res = {"status": "200", 'message': 'successfully fetched all users', 'data':{'posts' : posts}}; 
+
+        var posts  = await auth.get_all_pending_connections(userId);
+        res = {"status": "200", 'message': 'successfully fetched all users', 'data':posts}; 
         return res;
     }
     catch(err){

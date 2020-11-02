@@ -27,11 +27,12 @@ module.exports = {
     endorse_skill,
     delete_account,
     get_all_users,
-    get_all_posts,
+    // get_all_posts,
     like_post,
     clap_post,
-    support_post
-
+    support_post,
+    get_all_pending_connections,
+    
 };
 
 function sortBy(field) {
@@ -73,13 +74,14 @@ async function login_company({ email, password }) {
 async function signup_user(userParam) {
     try{
         if (await User.findOne({ email: userParam.email })) {
-            throw ('An account is already registered on the Email: ' + userParam.email );
+            return 0 ;
         }
         const user = new User(userParam);
         if (userParam.password) {
             user.password = bcrypt.hashSync(userParam.password, 10);
         }
         await user.save();
+        return 1;
     }
     catch(err){
         throw(err);
@@ -89,13 +91,15 @@ async function signup_user(userParam) {
 async function signup_company(companyParam) {
     try{
         if (await Company.findOne({ email: companyParam.email })) {
-            throw ('An account is already registered on the Email: ' + companyParam.email );
+            return 0;
+            // throw ('An account is already registered on the Email: ' + companyParam.email );
         }
         const company  = new Company(companyParam);
         if (companyParam.password) {
             company.password = bcrypt.hashSync(companyParam.password, 10);
         }
         await company.save();
+        return 1;
     }
     catch(err){
         throw(err);
@@ -120,16 +124,31 @@ async function my_profile({id, is_company}){
 
 async function update_profile({body, id, is_company}) {
     try{
+        var field;
+            var set_field;
+            for(const key in body)
+            {
+                field = body[key];
+                if(field != '' && field != undefined && field != NULL){
+                    set_field[key] = field;
+                }
+            }
         if(is_company){
-            const company = await Company.findById(id);
-            Object.assign(company,body)
-            await company.save(); 
+            await Company.findByIdAndUpdate(id, {
+                $set: set_field
+            })
+            // const company = await Company.findById(id);
+            // Object.assign(company,body)
+            // await company.save(); 
     
         }
         else{
-            const user = await User.find(id);
-            Object.assign(user,body);
-            await user.save();
+            await User.findByIdAndUpdate(id, {
+                $set: set_field
+            })
+            // const user = await User.find(id);
+            // Object.assign(user,body);
+            // await user.save();
         }
     }
     catch(err){
@@ -191,20 +210,28 @@ async function post_job({body, id}) {
 async function get_my_feed(id){
     try{
         var is_company = false;
-        var connections = await my_profile({ id, is_company }).connections; 
+        var data = await my_profile({ id, is_company }); 
+        var connections = data.connections;
         var i; 
         var feed = [];
         for(i=0; i<connections.length;i++){
             var connecteeId = connections[i]; 
-            var connecteeData = await my_profile({ connecteeId , is_company }); 
-            feed.push(connecteeData.posts);
+            var connecteeData = await User.findById(connecteeId);
+            // console.log(connecteeData);
+            for(var j= 0; j<connecteeData.posts.length; j++){
+                var postId = connecteeData.posts[i].postId;
+                
+                var postContent = await Post.findById(postId);
+                feed.push(postContent);
+            }            
         }
-        feed.sort(sortBy('postedAt'));
-        if(feed.length<=10){
-            return feed ;
-        }
+        feed.sort(sortBy('posted_at'));
+        
+        // if(feed.length<=10){
+        //     return feed ;
+        // }
 
-        return feed.slice(0,10); 
+        return feed; //.slice(0,10); 
     }
     catch(err){
         throw(err);
@@ -221,7 +248,7 @@ async function feed_company(id){
         for(i=0; i<jobsPosted.length;i++){
             var jobId = jobsPosted[i]; 
             var jobData = await get_job_details(jobId); 
-
+            
             feed.push(jobData);
         }
         feed.reverse();
@@ -240,14 +267,24 @@ async function send_connection(fromId, toId){
     try {
         if(fromId==toId){
             throw("Both ids are same");
-            return;
         }
 
         const fromUser = await User.findById(fromId);
         const toUser = await User.findById(toId);
         
+        if(toUser.connectionRequestsReceived.includes(fromId) || fromUser.connectionRequestsSent.includes(toId)){
+            throw("You have already sent request to this person");
+            
+        }
+
+        if(fromUser.connectionRequestsReceived.includes(toId)){
+            throw("This person has already sent you a request. Kindly accept.");
+            
+        }
+
         toUser.connectionRequestsReceived.push(fromId);
         fromUser.connectionRequestsSent.push(toId);
+
         await toUser.save();
         await fromUser.save();
 
@@ -260,16 +297,14 @@ async function accept_connection(fromId, toId){
     try {
         if(fromId==toId){
             throw("Both ids are same");
-            return;
         }
 
         const fromUser = await User.findById(fromId);
         const toUser = await User.findById(toId);
         
         // toId must be in connectionRequestsReceived of fromUser
-        if(!fromUser.connectionRequestsReceived.includes(toId) && !toUser.connectionRequestsReceived.incluse(fromId)) {
+        if(!(fromUser.connectionRequestsReceived.includes(toId) && toUser.connectionRequestsSent.includes(fromId))) {
             throw("Invalid request");
-            return;
         }        
 
         // then delete toId from connectionRequestsReceived (from fromUser) and delete fromId from connectionRequestsSent (from toUser)
@@ -278,8 +313,11 @@ async function accept_connection(fromId, toId){
 
         // add toId in connections of fromUser
         // add fromId in connections toUser
-        await fromUser.connections.push(toId);
-        await toUser.connections.push(fromId);
+        fromUser.connections.push(toId);
+        toUser.connections.push(fromId);
+
+        await fromUser.save();
+        await toUser.save();
 
     } catch(err){
         throw(err);
@@ -394,25 +432,25 @@ async function get_all_users(){
     }
 }
 
-async function get_all_posts(){
-    try{
-        var res = [];
-        res = await Post.find();
-        return res;
-    }
-    catch(err){
-        throw(err);
-    }
-}
+// async function get_all_connections_pos(userId){
+//     try{
+//         var res = [];
+//         res = await Post.find();
+//         return res;
+//     }
+//     catch(err){
+//         throw(err);
+//     }
+// }
 
 async function like_post({fromId, toPostId}){
     try{
         var post = await Post.findById(toPostId);
-        if(post.includes(fromId)){
+        if(post.likes.includes(fromId)){
             return 0; 
         }
         post.likes.push(fromId);
-        await post.save ();
+        await post.save();
         return 1;
     }
     catch(err){
@@ -424,7 +462,7 @@ async function like_post({fromId, toPostId}){
 async function clap_post({fromId, toPostId}){
     try{
         var post = await Post.findById(toPostId);
-        if(post.includes(fromId)){
+        if(post.claps.includes(fromId)){
             return 0; 
         }
         post.claps.push(fromId);
@@ -439,12 +477,27 @@ async function clap_post({fromId, toPostId}){
 async function support_post({fromId, toPostId}){
     try{
         var post = await Post.findById(toPostId);
-        if(post.includes(fromId)){
+        if(post.supports.includes(fromId)){
             return 0; 
         }
         post.supports.push(fromId);
         await post.save ();
         return 1;
+    }
+    catch(err){
+        throw(err);
+    }
+}
+
+
+async function get_all_pending_connections(userId){
+    try{
+        var user = await User.findById(userId);
+        var toSend = [];
+        for(var i = 0; i < user.connectionRequestsReceived.length; i++){
+            toSend.push({"_id":user.connectionRequestsReceived[i]}); 
+        }
+        return toSend; 
     }
     catch(err){
         throw(err);

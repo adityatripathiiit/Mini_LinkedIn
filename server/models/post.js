@@ -30,6 +30,12 @@ var postSchema = new mongoose.Schema({
         }
     ]    
 
+},
+{
+    timestamps: 
+        { 
+            createdAt: 'posted_at'
+        }
 });
 
 module.exports =  mongoose.model('post', postSchema)

@@ -145,7 +145,7 @@ net.createServer(function(sock) {
     }
   }
 
-  async function getMyFeed(){
+  async function getMyFeed(data){
     try{
       const token = jwt.decode(data.token); 
       const id = token.id; 
@@ -177,7 +177,7 @@ net.createServer(function(sock) {
      try {
         var index= data.body.index; 
         var fromId = jwt.decode(data.token).id;
-        var toId = data.body.userId;
+        var toId = data.body.id;
         if(index == -1){
           var res = await userControl.getallusers();
           sock.write(JSON.stringify(res));
@@ -195,11 +195,20 @@ net.createServer(function(sock) {
 
   async function acceptConnection(data){
     try {
-      var fromId = jwt.decode(data.tocken).id;
-      var toId = data.userId;
-      var res = await userControl.acceptconnection(fromId, toId);
-      sock.write(JSON.stringify(res));
-    } catch(err){
+
+      var index= data.body.index; 
+      var fromId = jwt.decode(data.token).id;
+      var toId = data.body.id;
+      if(index == -1){
+        var res = await userControl.getallpendingconnections(fromId);
+        sock.write(JSON.stringify(res));
+      }
+      else{
+        var res = await userControl.acceptconnection(fromId, toId);
+        sock.write(JSON.stringify(res));
+      }
+    } 
+    catch(err){
       var res = {"status":"400", "message":err, data:{}};
       sock.write(JSON.stringify(res));
     }
@@ -222,9 +231,9 @@ net.createServer(function(sock) {
     try{
       var index= data.body.index; 
       var fromId = jwt.decode(data.token).id;
-      var toPostId = data.body.postId;
+      var toPostId = data.body.id;
       if(index == -1){
-        var res = await userControl.getallposts();
+        var res = await userControl.getmyfeed(fromId);
         sock.write(JSON.stringify(res));
       }
       else{
@@ -239,9 +248,17 @@ net.createServer(function(sock) {
   }
   async function clap(data){
     try{
-      var res = await userControl.clappost(data.body);
-      sock.write(JSON.stringify(res));
-
+      var index= data.body.index; 
+      var fromId = jwt.decode(data.token).id;
+      var toPostId = data.body.id;
+      if(index == -1){
+        var res = await userControl.getmyfeed(fromId);
+        sock.write(JSON.stringify(res));
+      }
+      else{
+        var res = await userControl.clappost({fromId, toPostId});
+        sock.write(JSON.stringify(res));
+      }
     }
     catch(err){
       var res = {"status": "400", "message": err, data: {}};
@@ -251,9 +268,17 @@ net.createServer(function(sock) {
   async function support(data){
     try{
       
-      var res = await userControl.supportpost(data.body);
-      sock.write(JSON.stringify(res));
-
+      var index= data.body.index; 
+      var fromId = jwt.decode(data.token).id;
+      var toPostId = data.body.id;
+      if(index == -1){
+        var res = await userControl.getmyfeed(fromId);
+        sock.write(JSON.stringify(res));
+      }
+      else{
+        var res = await userControl.supportpost({fromId, toPostId});
+        sock.write(JSON.stringify(res));
+      }
     }
     catch(err){
       var res = {"status": "400", "message": err, data: {}};
@@ -301,7 +326,7 @@ net.createServer(function(sock) {
   }
 
   async function viewProfile(data, is_company){
-    try {
+    try { 
       var whoseId = data.body.whoseId;
       var res = await userControl.viewprofile(whoseId, is_company);
       sock.write(JSON.stringify(res));
@@ -354,7 +379,7 @@ net.createServer(function(sock) {
     else {
       
       if(await requireLogin(data.token) == 0){
-        var res = {"status": "400", "message":  "You are not logged in to perform this command.", data: {}};
+        var res = {"status": "400", "message":  "Kindly login to continue", data: {}};
         console.log(res);
         sock.write(JSON.stringify(res));
       } else{
@@ -391,6 +416,10 @@ net.createServer(function(sock) {
             case 'deleteAccount' :
               deleteAccount(data);
               break;
+
+            case 'updateProfile': 
+            updateProfile(data);
+            break;
                 
             default:
               invalidCommand();
@@ -416,7 +445,7 @@ net.createServer(function(sock) {
             break;
             
           case 'getMyFeed':
-            getMyFeed();
+            getMyFeed(data);
             break;
             
           case 'acceptConnection':
@@ -460,7 +489,6 @@ net.createServer(function(sock) {
               break;
          }
         }
-
 
       }
     }
