@@ -2,6 +2,7 @@ const net = require('net');
 const jwt = require('jsonwebtoken');
 const commands = require('./commands');
 const prompt = require('prompt-async');
+const util = require('util');
 
 const printInitMessage = ()=>{
   console.log('Welcome to Mini LikendIn. We support following features - \n');
@@ -15,7 +16,7 @@ const clientState = {
     "data":null,
 };
 
-const privilegedCommands = ["sendConnection","acceptConnection","like","clap","support","endorseSkill","applyToJob","viewProfile"];
+const privilegedCommands = ["sendConnection","acceptConnection","like","clap","support","endorseSkill","applyToJob","viewProfileUser","viewProfileCompany"];
 
 var HOST = '127.0.0.1';
 var PORT = 6969;
@@ -30,6 +31,12 @@ client.connect(PORT, HOST, function() {
     
   client.write(JSON.stringify(data));
 });
+
+function resetState(){
+  clientState.isPrivileged = false;    
+  clientState.whichIndex = -1;
+  clientState.firstTime = true;
+}
 
 async function takeInput(){ 
 
@@ -46,27 +53,45 @@ async function takeInput(){
       commandName = privilegedCommands[clientState.whichIndex];
 
       var feededData = await prompt.get(commands.askForData[commandName]);
-      var index = feededData.index;
 
       clientState.firstTime = false; 
 
-      if(index=='exit'){
-
-        clientState.isPrivileged = false;    
-        clientState.whichIndex = -1;
-        clientState.firstTime = true;
-        return null;
-
-      } else {
-
-        index = parseInt(index);
-        if(index < 0 || index >= clientState.data.length){
+      if(commandName=='viewProfileCompany'){
+        var indexOfJob = feededData.indexOfJob;
+        var indexOfApplicant = feededData.indexOfApplicant;
+        if(indexOfJob=='exit' || indexOfApplicant=='exit'){
+          resetState();
           return null;
         }
+        try {
+          data.index = 1;
+          data.id = clientState.data[indexOfJob].applicants[indexOfApplicant].userId;
+        } catch(err){
+          resetState();
+          return null;
+        }       
+      } else {
+        var index = feededData.index;    
+        if(index=='exit'){
+          resetState();
+          return null;
 
-        data.index = 1;
-        data.id = clientState.data[index]._id;        
-      }  
+        } else {
+
+          index = parseInt(index);
+          if(index < 0 || index >= clientState.data.length){
+            return null;
+          }
+
+          try{
+            data.index = 1;
+            data.id = clientState.data[index]._id; 
+          } catch(err){
+            resetState();
+            return null;
+          }               
+        }
+      }        
     } else {
 
       clientState.isPrivileged = false;    
@@ -118,7 +143,7 @@ client.on('data', async function(data) {
   if(clientState.firstTime && clientState.isPrivileged) clientState.data = data.data;  
 
   console.log('Data from server is - \n')
-  console.log(data);    
+  console.log(util.inspect(data, {showHidden: false, depth: null}));
 
 
   if(data.data.token != null){
@@ -134,7 +159,7 @@ client.on('data', async function(data) {
   }        
 
   console.log('Sending this data - \n');
-  console.log(dataToSend);
+  console.log(util.inspect(dataToSend, {showHidden: false, depth: null}));
   client.write(JSON.stringify(dataToSend));
 
 });

@@ -11,6 +11,7 @@
   "dependencies": {
     "jsonwebtoken": "^8.5.1",
     "prompt": "^1.0.0",
-    "prompt-async": "^0.9.9"
+    "prompt-async": "^0.9.9",
+    "util": "^0.12.3"
   }
 }

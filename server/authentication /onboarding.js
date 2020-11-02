@@ -5,7 +5,7 @@ const Company = require('../models/company');
 const Post = require('../models/post'); 
 const Job = require('../models/jobPosting'); 
 const config = require('../config.json');
-const jobPosting = require('../models/jobPosting');
+
 
 module.exports = {
     login_user,
@@ -23,16 +23,16 @@ module.exports = {
     apply_to_job,
     feed_company,
     get_job_details,
-    view_profile,
+    get_single_user,
     endorse_skill,
     delete_account,
     get_all_users,
-    // get_all_posts,
     like_post,
     clap_post,
     support_post,
     get_all_pending_connections,
-    
+    get_single_user_company,
+    get_all_jobs,
 };
 
 function sortBy(field) {
@@ -211,7 +211,8 @@ async function get_my_feed(id){
     try{
         var is_company = false;
         var data = await my_profile({ id, is_company }); 
-        var connections = data.connections;
+        var connections = data.connections;        
+        connections.push(id);
         var i; 
         var feed = [];
         for(i=0; i<connections.length;i++){
@@ -219,8 +220,7 @@ async function get_my_feed(id){
             var connecteeData = await User.findById(connecteeId);
             // console.log(connecteeData);
             for(var j= 0; j<connecteeData.posts.length; j++){
-                var postId = connecteeData.posts[i].postId;
-                
+                var postId = connecteeData.posts[j].postId;
                 var postContent = await Post.findById(postId);
                 feed.push(postContent);
             }            
@@ -242,21 +242,23 @@ async function feed_company(id){
     try{
         var is_company = true;
         var job = await my_profile({ id, is_company }); 
+        console.log(job);
         var jobsPosted = job.jobsPosted;
         var i; 
         var feed = [];
         for(i=0; i<jobsPosted.length;i++){
             var jobId = jobsPosted[i]; 
             var jobData = await get_job_details(jobId); 
-            
+            console.log(jobData);
             feed.push(jobData);
         }
+        console.log(feed);
         feed.reverse();
-        if(feed.length<=10){
-            return feed ;
-        }
+        // if(feed.length<=10){
+        return feed ;
+        // }
 
-        return feed.slice(0,10); 
+        // return feed.slice(0,10); 
     }
     catch(err){
         throw(err);
@@ -340,26 +342,21 @@ async function search_job(body){
     }
 }
 
-async function apply_to_job({body, id}){
+async function apply_to_job(userId,jobId){
     try{
-        var user_id = id;
-        var company_id = body.company_id;
-        var job_id = body.job_id;
         
-        const applied_job = await Job.findById(job_id);
-        
-        if(applied_job.find(pair => pair.userId === user_id)) {
+        const appliedJob = await Job.findById(jobId);
+        const companyId = appliedJob.companyId;
+        if(appliedJob.applicants.find(pair => pair.userId === userId)) {
             throw("Job already applied!");
         }
-
         const applied_at = new Date();
-        applied_job.applicants.push({userId: user_id, appliedAt: applied_at});
-        await applied_job.save();
+        appliedJob.applicants.push({userId: userId, appliedAt: applied_at});
+        await appliedJob.save();
 
-        const user = await User.findById(user_id);
-        user.appliedToJobs.push({companyId: company_id, appliedAt: applied_at});
+        const user = await User.findById(userId);
+        user.appliedToJobs.push({companyId: companyId, appliedAt: applied_at});
         await user.save();
-
     }
     catch(err){
         throw(err);
@@ -392,15 +389,39 @@ async function get_job_details(job_id){
     }
 }
 
-async function view_profile(whoseId, isCompany){ 
+async function get_single_user(whoseId, userId){ 
     try {
+        if(whoseId == userId){
+            throw("Use viewMyProfile command to see your profile");
+        }
+
         var user = await User.findById(whoseId);
-        user.viewedBy.push({whoseId, isCompany})                        
+        if(user.viewedBy.find(pair => pair.id == userId)){
+          return user;  
+        } 
+        user.viewedBy.push({id:userId, isCompany:false});  
+        await user.save();                      
         return user;
     } catch(err){
         throw(err);
     }
 }
+
+
+async function get_single_user_company(userId, companyId){ 
+    try {
+        var user = await User.findById(userId);
+        if(user.viewedBy.find(pair => pair.id == companyId)){
+          return user;  
+        } 
+        user.viewedBy.push({id:companyId, isCompany:true});  
+        await user.save();                      
+        return user;
+    } catch(err){
+        throw(err);
+    }
+}
+
 
 async function delete_account({id, is_company}){
     try{
@@ -423,6 +444,7 @@ async function get_all_users(){
         "_id": 1,
         "firstName": 1,
         "lastName":1,
+        "email":1
       });
       console.log(res);
       return res;
@@ -432,16 +454,6 @@ async function get_all_users(){
     }
 }
 
-// async function get_all_connections_pos(userId){
-//     try{
-//         var res = [];
-//         res = await Post.find();
-//         return res;
-//     }
-//     catch(err){
-//         throw(err);
-//     }
-// }
 
 async function like_post({fromId, toPostId}){
     try{
@@ -498,6 +510,15 @@ async function get_all_pending_connections(userId){
             toSend.push({"_id":user.connectionRequestsReceived[i]}); 
         }
         return toSend; 
+    }
+    catch(err){
+        throw(err);
+    }
+}
+async function get_all_jobs(){
+    try{
+        var jobs = await Job.find();
+        return jobs; 
     }
     catch(err){
         throw(err);

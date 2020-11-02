@@ -6,22 +6,22 @@ const commandsArray = {
         '4':'signUpCompany', 
         '5':'logout',  
         '6':'getMyProfile',
-		'7':'updateProfile',  //---          
+		'7':'updateProfile',  //---
  		'8':'deleteAccount', 
 		'9':'getMyFeed',       
 		'10':'like',  	
 		'11':'clap', 			
-		'12':'support',
+		'12':'support', 
 		'13':'acceptConnection',    
 		'14':'sendConnection',    
 		'15':'postJob',  
 		'16':'createPost', 
 		'17':'searchJob', //---        
-		'18':'feedCompany',  //---        
-		'19':'endorseSkill', //---          -p
-		'20':'applyToJob', //---      (done) -p   
-		'21':'viewProfile', //---     (done) -p     
-		'22':'getJobDetails' //---          
+		'18':'feedCompany',         
+		'19':'endorseSkill', //----p
+		'20':'applyToJob',  
+		'21':'viewProfileUser',
+		'22':'viewProfileCompany', 
 
 }
 
@@ -184,9 +184,19 @@ const askForData = {
 			}
 		}
 	},
-	"viewProfile":{
+	"viewProfileUser":{
 		"properties":{
 			"index":{
+				"required":true,
+			}
+		}
+	},
+	"viewProfileCompany":{
+		"properties":{
+			"indexOfJob":{
+				"required":true,
+			},
+			"indexOfApplicant":{
 				"required":true,
 			}
 		}

@@ -288,9 +288,17 @@ net.createServer(function(sock) {
 
   async function applyToJob(data){
     try{
-      var body = data.body;
-      var res = await userControl.applytojob(body);
-      sock.write(JSON.stringify(res));
+      var index = data.body.index; 
+      var userId = jwt.decode(data.token).id;
+      var jobId = data.body.id;
+      if(index == -1){
+        var res = await userControl.getalljobs();
+        sock.write(JSON.stringify(res));
+      }
+      else{
+        var res = await userControl.applytojob(userId,jobId);
+        sock.write(JSON.stringify(res));
+      }
     }
     catch(err){
       var res = {"status": "400", "message": err, data: {}};
@@ -301,7 +309,7 @@ net.createServer(function(sock) {
   async function endorseSkill(data){
     try{
       var body = data.body;
-      var user_id = jwt.decode(data.tocken).id;
+      var user_id = jwt.decode(data.token).id;
       var endourse_id = data.user_id ;
       var skill_index = data.skill_index; 
       var res = await userControl.endorseskill({user_id,endourse_id, skill_index});
@@ -313,29 +321,43 @@ net.createServer(function(sock) {
     }
   }
 
-
-  async function getJobDetails(data){
-    try{
-      var res = await userControl.getjobdetails(data.body);
-      sock.write(JSON.stringify(res));
-    }
-    catch(err){
-      var res = {"status": "400", "message": err, data: {}};
-      sock.write(JSON.stringify(res));
-    }
-  }
-
-  async function viewProfile(data, is_company){
+  async function viewProfileUser(data){
     try { 
-      var whoseId = data.body.whoseId;
-      var res = await userControl.viewprofile(whoseId, is_company);
-      sock.write(JSON.stringify(res));
+      var index = data.body.index; 
+      var userId = jwt.decode(data.token).id;
+      var whoseId = data.body.id;
+      if(index == -1){        
+        var res = await userControl.getallusers();        
+        sock.write(JSON.stringify(res));
+      }
+      else{        
+        var res = await userControl.getsingleuser(whoseId,userId);
+        sock.write(JSON.stringify(res));
+      }
     } catch(err){
       var res = {"status": "400", "message": err, data: {}};
       sock.write(JSON.stringify(res));
     }
   }
 
+  async function viewProfileCompany(data){
+    try { 
+      var index = data.body.index; 
+      var companyId = jwt.decode(data.token).id;
+      var userId = data.body.id;
+      if(index == -1){        
+        var res = await userControl.feedcompany(companyId); 
+        sock.write(JSON.stringify(res));
+      }
+      else{
+        var res = await userControl.getsingleusercompany(userId,companyId);
+        sock.write(JSON.stringify(res));
+      }
+    } catch(err){
+      var res = {"status": "400", "message": err, data: {}};
+      sock.write(JSON.stringify(res));
+    }
+  }
   
 
   async function deleteAccount (data){
@@ -405,8 +427,8 @@ net.createServer(function(sock) {
             case 'getJobDetails':
               getJobDetails(data);
               break ;
-            case 'viewProfile':
-              viewProfile(data, true);
+            case 'viewProfileCompany':
+              viewProfileCompany(data);
               break;
 
             case 'getMyProfile' :
@@ -430,28 +452,22 @@ net.createServer(function(sock) {
         switch(command){
           case 'logout' : 
             logout(); 
-            break;                  
-            
+            break;                              
           case 'getMyProfile' :
             getMyProfile(data);
-            break;
-                        
+            break;                      
           case 'updateProfile': 
             updateProfile(data);
             break;
-
           case 'createPost':
             createPost(data);
-            break;
-            
+            break;            
           case 'getMyFeed':
             getMyFeed(data);
-            break;
-            
+            break;            
           case 'acceptConnection':
             acceptConnection(data);
             break;
-
           case 'searchJob':
             searchJob(data);
             break;
@@ -467,26 +483,24 @@ net.createServer(function(sock) {
           case 'support':
             support(data);
             break; 
-
           case 'applyToJob':
             applyToJob(data);
             break;
           case 'getJobDetails':
             getJobDetails(data);
-            break ;
-          
+            break ;          
           case 'endorseSkill': 
             endorseSkill(data);
-          case 'viewProfile':
-              viewProfile(data, false);
-              break;
+            break;
+          case 'viewProfileUser':
+              viewProfileUser(data);
+            break;
           case 'deleteAccount' :
             deleteAccount(data);
             break;
-
           default:
-              invalidCommand();
-              break;
+            invalidCommand();
+            break;
          }
         }
 
