@@ -6,9 +6,9 @@ const commandsArray = {
         '4':'signUpCompany', 
         '5':'logout',  
         '6':'getMyProfile',
-		'7':'updateProfile',  //---
+		'7':'updateProfileUser',  
  		'8':'deleteAccount', 
-		'9':'getMyFeed',       
+		'9':'getMyFeed',     
 		'10':'like',  	
 		'11':'clap', 			
 		'12':'support', 
@@ -21,7 +21,7 @@ const commandsArray = {
 		'19':'endorseSkill', //----p
 		'20':'applyToJob',  
 		'21':'viewProfileUser',
-		'22':'viewProfileCompany', 
+		'22':'viewProfileCompany', 		
 
 }
 
@@ -131,7 +131,10 @@ const askForData = {
 				
 			},
 			"budget":{
-				"required":false				
+				"required":false,				
+			},
+			"skillSet":{
+				"required":false,
 			}
 		}
 	},
@@ -198,6 +201,26 @@ const askForData = {
 			},
 			"indexOfApplicant":{
 				"required":true,
+			}
+		}
+	},
+	"updateProfileUser":{
+		"properties":{
+			"status":{
+				"required": false
+			},
+			"title":{
+				"required": false
+			},
+			"address":{
+				"required": false
+			}
+		}
+	},
+	"searchJob":{
+		"properties":{
+			"skills":{
+				"required":false
 			}
 		}
 	}

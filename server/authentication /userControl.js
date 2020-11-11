@@ -5,7 +5,7 @@ module.exports = {
     signupuser,
     signupcompany,
     myprofile,
-    updateprofile,
+    updateprofileuser,
     getmyfeed,
     createpost,
     postjob,
@@ -126,10 +126,10 @@ async function myprofile({id, is_company}) {
     }
 }
 
-async function updateprofile({body, id, is_company}){
+async function updateprofileuser(body, id){
     var res;
     try{
-        await auth.update_profile({body, id, is_company});
+        await auth.update_profile_user(body, id);
         res = {"status": "200", 'message': 'Successfully updated profile! ', "data": {}};
         return res;
     }

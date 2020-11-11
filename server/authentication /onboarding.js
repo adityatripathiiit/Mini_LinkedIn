@@ -13,7 +13,7 @@ module.exports = {
     signup_user,
     signup_company,
     my_profile,
-    update_profile,
+    update_profile_user,
     create_post,
     post_job,
     send_connection,
@@ -122,34 +122,22 @@ async function my_profile({id, is_company}){
     }
 }
 
-async function update_profile({body, id, is_company}) {
+async function update_profile_user(body, id) {
     try{
         var field;
-            var set_field;
-            for(const key in body)
-            {
-                field = body[key];
-                if(field != '' && field != undefined && field != NULL){
-                    set_field[key] = field;
+            var setField = {};
+            const keys = Object.keys(body)
+            
+            for (const key of keys) {
+                const temp = key;
+                field = body[temp];
+                if(field != '' && field != undefined && field != null){
+                    setField[temp] = field;
                 }
             }
-        if(is_company){
-            await Company.findByIdAndUpdate(id, {
-                $set: set_field
-            })
-            // const company = await Company.findById(id);
-            // Object.assign(company,body)
-            // await company.save(); 
-    
-        }
-        else{
             await User.findByIdAndUpdate(id, {
-                $set: set_field
+                $set: setField
             })
-            // const user = await User.find(id);
-            // Object.assign(user,body);
-            // await user.save();
-        }
     }
     catch(err){
         throw(err); 
@@ -329,7 +317,8 @@ async function accept_connection(fromId, toId){
 async function search_job(body){
     try{
         var jobs = [];
-        jobs = await Job.find({ skillSet: {$in: body.skills } });
+        var skills = body.skills.split(" ");
+        jobs = await Job.find({ skillSet: {$in: skills } });
            
         if(jobs.length<=10){
             return jobs ;

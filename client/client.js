@@ -20,16 +20,33 @@ const privilegedCommands = ["sendConnection","acceptConnection","like","clap","s
 
 var HOST = '127.0.0.1';
 var PORT = 6969;
+const BUFF_SIZE = 2; // in bytes2
 
 var clientToken = '';
 
 var client = new net.Socket();
 
+function parse_data(data){
+    var sData = JSON.stringify(data);
+    var enData = Buffer.from(sData, 'utf-8');
+    enData = enData.toString('hex');
+    
+    const maxCount = enData.length/(2*BUFF_SIZE);
+    for(var i =0; i<maxCount; i++){
+      
+      client.write(enData.slice(i*2*BUFF_SIZE, (i+1)*2*BUFF_SIZE));
+    }
+    client.write(Buffer.from('\n', 'utf-8').toString('hex'));
+}
+
+
 client.connect(PORT, HOST, function() {
   printInitMessage();
-  const data = {"command": "", "body":"","token":clientToken};
-    
-  client.write(JSON.stringify(data));
+  var data = {"command": "", "body":"","token":clientToken};
+  
+  parse_data(data);
+
+  // client.write(JSON.stringify(data));
 });
 
 function resetState(){
@@ -135,32 +152,48 @@ async function takeInput(){
 
 }
 
-
-client.on('data', async function(data) {    
-  data = JSON.parse(data);  
+var data ="";
+client.on('data', async function(recvData) {   
   
-  // set only for first time
-  if(clientState.firstTime && clientState.isPrivileged) clientState.data = data.data;  
-
-  console.log('Data from server is - \n')
-  console.log(util.inspect(data, {showHidden: false, depth: null}));
-
-
-  if(data.data.token != null){
-    clientToken = data.data.token; 
+  recvData = Buffer.from(recvData, 'hex').toString();
+  var flag = 0;
+  if(recvData.slice(-2) == '0a'){
+    flag = 1;
+    var length = recvData.length;
+    recvData = recvData.slice(0,length-2);
   }
-  
-  var dataToSend = null;
-  while(!dataToSend){
-     dataToSend = await takeInput();
-     if(!dataToSend) {       
-       continue;
-     }
-  }        
+  data += recvData;
+    
+  if(flag == 1){
+    data = Buffer.from(data, 'hex').toString();
+    data = JSON.parse(data); 
+    
+    // set only for first time
+    if(clientState.firstTime && clientState.isPrivileged) clientState.data = data.data;  
 
-  console.log('Sending this data - \n');
-  console.log(util.inspect(dataToSend, {showHidden: false, depth: null}));
-  client.write(JSON.stringify(dataToSend));
+    console.log('Data from server is - \n')
+    console.log(util.inspect(data, {showHidden: false, depth: null}));
+
+
+    if(data.data.token != null){
+      clientToken = data.data.token; 
+    }
+    
+    var dataToSend = null;
+    data = "";
+    while(!dataToSend){
+      dataToSend = await takeInput();
+      if(!dataToSend) {       
+        continue;
+      }
+    }        
+
+    console.log('Sending this data - \n');
+    console.log(util.inspect(dataToSend, {showHidden: false, depth: null}));
+
+    parse_data(dataToSend);
+    // client.write(JSON.stringify(dataToSend));
+  }
 
 });
 
