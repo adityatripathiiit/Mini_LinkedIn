@@ -28,7 +28,9 @@ var userSchema = new mongoose.Schema({
     },
     skills : [
         {
-            type : String,
+            skillName : {
+                type:String,
+            },
             endorsedBy: [
                 {
                     type:String

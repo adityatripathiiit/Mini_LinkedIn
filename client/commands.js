@@ -1,32 +1,31 @@
 const commandsArray = {
         '0':'exitProgram', 
-        '1':'loginUser',
-        '2':'loginCompany',
-        '3':'signUpUser', 
-        '4':'signUpCompany', 
-        '5':'logout',  
-        '6':'getMyProfile',
-		'7':'updateProfileUser',  
- 		'8':'deleteAccount', 
-		'9':'getMyFeed',     
-		'10':'like',  	
-		'11':'clap', 			
-		'12':'support', 
-		'13':'acceptConnection',    
-		'14':'sendConnection',    
-		'15':'postJob',  
-		'16':'createPost', 
-		'17':'searchJob', //---        
-		'18':'feedCompany',         
-		'19':'endorseSkill', //----p
-		'20':'applyToJob',  
-		'21':'viewProfileUser',
-		'22':'viewProfileCompany', 		
+        '1':'login',        
+        '2':'signUpUser', 
+        '3':'signUpCompany', 
+        '4':'logout',  
+        '5':'getMyProfile',
+		'6':'updateProfileUser',  
+ 		'7':'deleteAccount', 
+		'8':'getMyFeed',     
+		'9':'like',  	
+		'10':'clap', 			
+		'11':'support', 
+		'12':'acceptConnection',    
+		'13':'sendConnection',    
+		'14':'postJob',  
+		'15':'createPost', 
+		'16':'searchJob',
+		'17':'feedCompany',         
+		'18':'endorseSkill', 
+		'19':'applyToJob',  
+		'20':'viewProfileUser',
+		'21':'viewProfileCompany', 		
 
 }
 
 const askForData = {
-	'loginUser':{
+	'login':{
 		"properties":{
 			"email":{
 				"required": true,				
@@ -35,20 +34,6 @@ const askForData = {
 						"hidden":true,
 						"replace": '*',
 						"required": true,						
-			}
-		}
-	},
-	'loginCompany':{
-		"properties":{
-			"email":{	
-				"required": true,
-				
-			},
-			"password":{
-					"hidden":true,
-					"replace": '*',
-					"required": true,
-					
 			}
 		}
 	},
@@ -214,6 +199,9 @@ const askForData = {
 			},
 			"address":{
 				"required": false
+			},
+			"skills":{
+				"required":false
 			}
 		}
 	},
@@ -221,6 +209,16 @@ const askForData = {
 		"properties":{
 			"skills":{
 				"required":false
+			}
+		}
+	},
+	"endorseSkill":{
+		"properties":{
+			"indexOfUser":{
+				"required":true,				
+			},
+			"indexOfSkill":{
+				"required":true,				
 			}
 		}
 	}

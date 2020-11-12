@@ -1,7 +1,7 @@
 
 var net = require('net');
 const jwt = require('jsonwebtoken');
-const userControl = require('./authentication /userControl');
+const userControl = require('./authentication/userControl');
 const config = require('./config.json');
 var HOST = '127.0.0.1';
 var PORT = 6969;
@@ -69,26 +69,14 @@ net.createServer(function(sock) {
     }
   }
 
-  async function loginUser (data){
+  async function login(data){
     try{
-      var res = await userControl.loginuser(data.body);
+      var res = await userControl.login(data.body);
       console.log(res);
       parse_data(res);
     }
     catch(err){
       var res = {"status" : "400", "message" : err, data: {}};
-      parse_data(res);
-    }
-  }
-
-  async function loginCompany (data){
-    try{
-      var res = await userControl.logincompany(data.body);
-      console.log(res);
-      parse_data(res); 
-    }
-    catch(err){
-      var res = {"status": "400", "message": err, data: {}};
       parse_data(res);
     }
   }
@@ -323,12 +311,20 @@ net.createServer(function(sock) {
 
   async function endorseSkill(data){
     try{
-      var body = data.body;
+
+      var index = data.body.index;      
       var user_id = jwt.decode(data.token).id;
-      var endourse_id = data.user_id ;
-      var skill_index = data.skill_index; 
-      var res = await userControl.endorseskill({user_id,endourse_id, skill_index});
-      parse_data(res);
+
+      if(index == -1){
+        var res = await userControl.getallusersinconnection(user_id);
+        parse_data(res);
+      } else {
+        var endourse_id = data.body.user_id ;        
+        var skill_index = parseInt(data.body.skill_index); 
+        var res = await userControl.endorseskill({user_id,endourse_id, skill_index});
+        parse_data(res);
+      }
+      
     }
     catch(err){
       var res = {"status": "400", "message": err, data: {}};
@@ -413,11 +409,8 @@ net.createServer(function(sock) {
       data = JSON.parse(data);
       console.log(data);
   
-      if(data.command == 'loginUser'){
-        loginUser(data);
-      } 
-      else if (data.command == 'loginCompany'){
-        loginCompany(data);
+      if(data.command == 'login'){
+        login(data);
       } 
       else if (data.command == 'signUpUser'){
         signUpUser(data);

@@ -87,7 +87,24 @@ async function takeInput(){
           resetState();
           return null;
         }       
-      } else {
+      } else if(commandName=='endorseSkill'){
+        var indexOfUser = feededData.indexOfUser;
+        var indexOfSkill = feededData.indexOfSkill;
+        if(indexOfJob=='exit' || indexOfApplicant=='exit'){
+          resetState();
+          return null;
+        }
+        try {
+          data.index = 1;
+          data.user_id = clientState.data[indexOfUser]._id;
+          data.skill_index = indexOfSkill;
+
+        } catch(err){
+          resetState();
+          return null;
+        }
+      } 
+      else {
         var index = feededData.index;    
         if(index=='exit'){
           resetState();
