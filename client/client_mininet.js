@@ -1,8 +1,13 @@
 const net = require('net');
 const jwt = require('jsonwebtoken');
 const commands = require('./commands');
-const prompt = require('prompt-async');
+// const prompt = require('prompt-async');
 const util = require('util');
+const readline = require('readline').createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
 
 const printInitMessage = ()=>{
   console.log('Welcome to Mini LikendIn. We support following features - \n');
@@ -55,22 +60,50 @@ function resetState(){
   clientState.firstTime = true;
 }
 
+function ask(questionText) {
+  return new Promise((resolve, reject) => {
+      readline.question(questionText, resolve);
+  });
+}
+
 async function takeInput(){ 
 
     var data = {};
 
     var commandName;
 
-    prompt.start();
+
+    async function start() {
+      feededData = await ask('');
+      feededData = JSON.parse(feededData);
+    }
+    
+    async function start1() {
+      commandKey = await ask('');
+    }
+    async function start2() {
+      data = await ask('');
+      data = JSON.parse(data);
+    }
+
+    // prompt.start();
 
     if(clientState.isPrivileged){
 
       console.log(" \n This is a priviledged command. Enter index below to execute command or type 'exit' to go back to normal command. \n");
 
       commandName = privilegedCommands[clientState.whichIndex];
+      var feededData; 
+      // var feededData = await prompt.get(commands.askForData[commandName]);
+      // const it = readline[Symbol.asyncIterator]();
+      // feededData = await it.next();
+      // readline.close()
+      // feededData = JSON.parse(feededData.value);      
 
-      var feededData = await prompt.get(commands.askForData[commandName]);
-
+      
+    
+      await start();
+      
       clientState.firstTime = false; 
 
       if(commandName=='viewProfileCompany'){
@@ -84,8 +117,8 @@ async function takeInput(){
           data.index = 1;
           data.id = clientState.data[indexOfJob].applicants[indexOfApplicant].userId;
         } catch(err){
-          resetState();
-          return null;
+          resetState(); 
+          return null;  
         }       
       } else {
         var index = feededData.index;    
@@ -115,10 +148,26 @@ async function takeInput(){
       clientState.whichIndex = -1;
       clientState.firstTime = true;
       
-      var commandKey = await prompt.get(['command']);      
-      commandKey = commandKey.command;    
+      // var commandKey = await prompt.get(['command']);    
+      var commandKey;
 
-      if(commandKey==0){
+      // const it = readline[Symbol.asyncIterator]();
+      // commandKey = await it.next();
+      // readline.close()
+      // commandKey = commandKey.value;
+      // console.log(commandKey);   
+
+      process.send({key:"bhejo"});
+      // process.on("listening_parent", (m)=> {
+      //   console.log(m);
+      //   commandKey = m.key;
+      // });
+  
+      // await start1();
+      
+      
+
+      if(commandKey=='0'){
         client.destroy();
         process.exit();
       }
@@ -134,7 +183,18 @@ async function takeInput(){
       const isThisPriviledged = privilegedCommands.includes(commandName);    
 
       if(!isThisPriviledged && commands.askForData[commandName]){      
-          data = await prompt.get(commands.askForData[commandName]);   
+          // data = await prompt.get(commands.askForData[commandName]);  
+          
+          // const it = readline[Symbol.asyncIterator]();
+          // data = await it.next();
+          // data= JSON.parse(data.value);
+          process.send({key:"bhejo"});
+          process.on("listening_parent", (m)=> {
+            data = m.key;
+          });
+          
+          // await start2();
+        
       }     
 
       if(isThisPriviledged){
