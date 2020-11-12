@@ -328,10 +328,7 @@ async function search_job(body){
         var skills = body.skills.split(" ");
         jobs = await Job.find({ skillSet: {$in: skills } });
            
-        if(jobs.length<=10){
-            return jobs ;
-        }
-        return jobs.slice(0,10); 
+        return jobs;
 
     }
     catch(err){
@@ -364,6 +361,7 @@ async function apply_to_job(userId,jobId){
 async function endorse_skill({user_id,endourse_id, skill_index}){
     try{
         const is_company = false ;
+        if(user_id==endourse_id) throw("You can't endorse yourself!");
         var user = await User.findById(endourse_id);        
         if(!user) return 0;        
         if(user.skills.length <= skill_index) throw("Invalid skill");
