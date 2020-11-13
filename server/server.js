@@ -3,7 +3,8 @@ var net = require('net');
 const jwt = require('jsonwebtoken');
 const userControl = require('./authentication /userControl');
 const config = require('./config.json');
-var HOST = '10.0.0.1';
+var myArg = process.argv.slice(2);
+var HOST = myArg[0];
 var PORT = 6969;
 
 const BUFF_SIZE = 2;

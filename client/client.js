@@ -18,7 +18,8 @@ const clientState = {
 
 const privilegedCommands = ["sendConnection","acceptConnection","like","clap","support","endorseSkill","applyToJob","viewProfileUser","viewProfileCompany"];
 
-var HOST = '10.0.0.1';
+var myArg = process.argv.slice(2);
+var HOST = myArg[0];
 var PORT = 6969;
 const BUFF_SIZE = 2; // in bytes2
 

@@ -2,7 +2,8 @@ import sys
 import pexpect
 import pickle
 count = int(sys.argv[1])
-print(count)
+IP = sys.argv[2]
+command = 'node ../client/client.js '+IP
 
 firstName = []
 lastName = []
@@ -45,7 +46,7 @@ with open ('./workload/content.txt', 'rb') as fp:
 # print(content)
 
 
-c = pexpect.spawn('node ../client/client.js', encoding='utf-8')
+c = pexpect.spawn(command, encoding='utf-8')
 c.logfile_read = sys.stdout
 
 from func_def import *
