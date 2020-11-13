@@ -18,7 +18,7 @@ const clientState = {
 
 const privilegedCommands = ["sendConnection","acceptConnection","like","clap","support","endorseSkill","applyToJob","viewProfileUser","viewProfileCompany"];
 
-var HOST = '127.0.0.1';
+var HOST = '10.0.0.1';
 var PORT = 6969;
 const BUFF_SIZE = 2; // in bytes2
 

@@ -2,7 +2,7 @@ import sys
 import pexpect
 import pickle
 count = int(sys.argv[1])
-
+print(count)
 
 firstName = []
 lastName = []
@@ -45,18 +45,18 @@ with open ('./workload/content.txt', 'rb') as fp:
 # print(content)
 
 
-# c = pexpect.spawn('node ../client/client.js', encoding='utf-8')
-# c.logfile_read = sys.stdout
+c = pexpect.spawn('node ../client/client.js', encoding='utf-8')
+c.logfile_read = sys.stdout
 
-# from func_def import *
+from func_def import *
 
-# signUpUser(firstName[count],lastName[count],email[count], password[count],c)
-# login(email[count], password[count],c)
+signUpUser(firstName[count],lastName[count],email[count], password[count],c)
+login(email[count], password[count],c)
 # # signUpCompany(companyName[count],description[count],address[count],email[count], password[count],c)
 # # loginCompany(email[count], password[count],c)
-# getMyProfile(c)
+getMyProfile(c)
 # updateProfileUser(status[count], title[count],address[count],c)
-# getMyFeed(c)
+getMyFeed(c)
 # # like(index[count],c)
 # # clap(index[count],c)
 # # support(index[count],c)
@@ -68,7 +68,7 @@ with open ('./workload/content.txt', 'rb') as fp:
 # # applyToJob(index[count],c)
 # # viewProfileUser(index[count],c)
 
-# logout(c)
-# endsession(c)
+logout(c)
+endsession(c)
 
 
