@@ -12,10 +12,10 @@ def main():
 
 	h1 = net.get('h1')
 	h2 = net.get('h2')
-	p1 = h1.popen('node ../server/server.js &' )
+	p1 = h1.popen('node ../server/server.js %s & ' %h1.IP())
 	sleep(2)
-	print(h2.cmd('python3 ../mininet/test_user.py 1'))
-	CLI( net )
+	print(h2.cmd('python3 ../mininet/test_user.py 1 %s' %h1.IP()))
+	CLI(net)
 	p1.terminate()
 	net.stop()
 
