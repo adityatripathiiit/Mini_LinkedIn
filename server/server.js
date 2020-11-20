@@ -42,7 +42,7 @@ net.createServer(function(sock) {
       // console.log(enData.slice(i*2*BUFF_SIZE, (i+1)*2*BUFF_SIZE));
       sock.write(enData.slice(i*2*BUFF_SIZE, (i+1)*2*BUFF_SIZE));
     }
-    sock.write(Buffer.from('\n', 'utf-8').toString('hex'));
+    sock.write(Buffer.from('EOI', 'utf-8').toString('hex'));
   }
 
   async function signUpUser(data){
@@ -398,10 +398,10 @@ net.createServer(function(sock) {
   sock.on('data', async function(recvData) {
     recvData = Buffer.from(recvData, 'hex').toString();
     var flag = 0;
-    if(recvData.slice(-2) == '0a'){
+    if(recvData.slice(-6) == '454f49'){
       flag = 1;
       var length = recvData.length;
-      recvData = recvData.slice(0,length-2);
+      recvData = recvData.slice(0,length-6);
     }
     data += recvData;
     

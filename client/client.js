@@ -37,7 +37,9 @@ function parse_data(data){
       
       client.write(enData.slice(i*2*BUFF_SIZE, (i+1)*2*BUFF_SIZE));
     }
-    client.write(Buffer.from('\n', 'utf-8').toString('hex'));
+    // Sending End Of Instruction
+    // console.log(Buffer.from('EOI', 'utf-8').toString('hex'))
+    client.write(Buffer.from('EOI', 'utf-8').toString('hex'));
 }
 
 
@@ -46,6 +48,7 @@ client.connect(PORT, HOST, function() {
   var data = {"command": "", "body":"","token":clientToken};
   
   parse_data(data);
+
 
   // client.write(JSON.stringify(data));
 });
@@ -175,10 +178,10 @@ client.on('data', async function(recvData) {
   
   recvData = Buffer.from(recvData, 'hex').toString();
   var flag = 0;
-  if(recvData.slice(-2) == '0a'){
+  if(recvData.slice(-6) == '454f49'){
     flag = 1;
     var length = recvData.length;
-    recvData = recvData.slice(0,length-2);
+    recvData = recvData.slice(0,length-6);
   }
   data += recvData;
     
