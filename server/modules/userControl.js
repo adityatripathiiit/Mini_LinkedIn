@@ -1,4 +1,4 @@
-const auth = require('./onboarding');
+const auth = require('./databaseAPI');
 module.exports = {
     login,    
     signupuser,
@@ -6,15 +6,8 @@ module.exports = {
     myprofile,
     updateprofileuser,
     getmyfeed,
-    createpost,
-    postjob,
     sendconnection,
     acceptconnection,
-    searchjob,
-    likepost,
-    clappost,
-    supportpost,
-    applytojob,
     feedcompany,
     endorseskill,
     getsingleuser,
@@ -22,11 +15,8 @@ module.exports = {
     getallusers,
     getsingleusercompany,
     getallpendingconnections,
-    getalljobs,
     getallusersinconnection,
-
 };
-
 
 async function login(req) {
     const email = req.email;
@@ -47,8 +37,7 @@ async function login(req) {
         console.log(err);
         res = {"status": "400", 'message': err, "data": {}};
         return res;
-    }
-    
+    }  
 }
 
 async function signupuser(req){
@@ -115,34 +104,6 @@ async function updateprofileuser(body, id){
     }
 }
 
-async function createpost({body, id}){
-    var res;
-    try{        
-        await auth.create_post({body, id});
-        res = {"status": "200", 'message': 'Successfully created post! ', "data": {}};
-        return res;
-    }
-    catch(err){
-        console.log(err);
-        res = {"status": "400", 'message': err, "data": {}};
-        return res; 
-    }
-}
-
-async function postjob({body, id}){
-    var res;
-    try{        
-        await auth.post_job({body, id});
-        res = {"status": "200", 'message': 'Successfully posted job! ', "data": {}};
-        return res;
-    }
-    catch(err){
-        console.log(err);
-        res = {"status": "400", 'message': err, "data": {}};
-        return res; 
-    }
-}
-
 async function getmyfeed(id){
     var res;
     try{
@@ -157,7 +118,6 @@ async function getmyfeed(id){
     }
 }
 
-
 async function feedcompany(id){
     var res;
     try{
@@ -171,6 +131,7 @@ async function feedcompany(id){
         return res; 
     }
 }
+
 async function getmyfeed(id){
     var res;
     try{
@@ -184,8 +145,6 @@ async function getmyfeed(id){
         return res; 
     }
 }
-
-
 
 async function sendconnection(fromId, toId){
     try {
@@ -209,78 +168,6 @@ async function acceptconnection(fromId, toId){
         return res; 
     }
 }
-
-async function searchjob(body){
-    var res;
-    try{
-        var value = await auth.search_job(body);
-        res = {"status": "200", 'message': "Feed fetched successfully!", "data": value};
-        return res;
-    }
-    catch(err){
-        console.log(err);
-        res = {"status": "400", 'message': err, "data": {}};
-        return res; 
-    }
-}
-
-
-async function likepost({fromId, toPostId}){
-    var res;
-    try{
-        var isValid = await auth.like_post({fromId, toPostId});
-        if(isValid){
-            res = {"status": "200", "message": "Successfully liked!", "data": {}};
-        }
-        else {
-            res = {"status": "300", "message": "Already liked!", "data": {}};
-        }
-        return res;
-    }
-    catch(err){
-        console.log(err);
-        res = {"status": "400", 'message': err, "data": {}};
-        return res; 
-    }
-}
-
-async function clappost({fromId, toPostId}){
-    var res;
-    try{
-        var isValid = await auth.clap_post({fromId, toPostId});
-        if(isValid){
-            res = {"status": "200", "message": "Successfully clapped!", "data": {}};
-        }
-        else {
-            res = {"status": "300", "message": "Already clapped!", "data": {}};
-        }
-        return res;
-    }
-    catch(err){
-        console.log(err);
-        res = {"status": "400", 'message': err, "data": {}};
-        return res; 
-    }
-}
-async function supportpost({fromId, toPostId}){
-    var res;
-    try{
-        var isValid = await auth.support_post({fromId, toPostId});
-        if(isValid){
-            res = {"status": "200", "message": "Successfully supported!", "data": {}};
-        }
-        else {
-            res = {"status": "300", "message": "Already supported!", "data": {}};
-        }
-        return res;
-    }
-    catch(err){
-        console.log(err);
-        res = {"status": "400", 'message': err, "data": {}};
-        return res; 
-    }
-}
-
 
 async function endorseskill({user_id,endourse_id, skill_index}){
     var res;
@@ -329,7 +216,6 @@ async function getsingleusercompany(userId,companyId){
     }
 }
 
-
 async function deleteaccount({id, is_company}) {
     var res;
     try{
@@ -369,36 +255,7 @@ async function getallpendingconnections(userId){
         console.log(err);
         res = {"status": "400", 'message': err, "data": {}};
         return res;
-    }
-    
-}
-
-async function getalljobs(){
-    try{
-        var jobs  = await auth.get_all_jobs();
-        res = {"status": "200", 'message': 'successfully fetched all users', 'data':jobs}; 
-        return res;
-    }
-    catch(err){
-        console.log(err);
-        res = {"status": "400", 'message': err, "data": {}};
-        return res;
-    }
-    
-}
-
-async function applytojob(userId,jobId){
-    try{
-        await auth.apply_to_job(userId,jobId);
-        res = {"status": "200", 'message': 'successfully applied to the job!', 'data':{}}; 
-        return res;
-    }
-    catch(err){
-        console.log(err);
-        res = {"status": "400", 'message': err, "data": {}};
-        return res;
-    }
-    
+    } 
 }
 
 async function getallusersinconnection(userId){

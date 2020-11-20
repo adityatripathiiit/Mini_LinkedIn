@@ -174,6 +174,7 @@ async function takeInput(){
 }
 
 var data ="";
+
 client.on('data', async function(recvData) {   
   
   recvData = Buffer.from(recvData, 'hex').toString();

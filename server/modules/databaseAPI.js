@@ -41,7 +41,6 @@ function sortBy(field) {
     };
 }
 
-
 async function login({ email, password }) {
     try{
         const user = await User.findOne({ email });
@@ -88,7 +87,6 @@ async function signup_company(companyParam) {
     try{
         if (await Company.findOne({ email: companyParam.email })) {
             return 0;
-            // throw ('An account is already registered on the Email: ' + companyParam.email );
         }
         const company  = new Company(companyParam);
         if (companyParam.password) {
@@ -154,17 +152,13 @@ async function update_profile_user(body, id) {
 
 async function create_post({body, id}) {
     try{
-
         var value = {
             postById: id,   
             ...body
         }
         const post = new Post(value);
-
         var posted_at = new Date();
-
         var val = await post.save(); 
-        
         var post_id = val._id;
         const user = await User.findById(id);        
         const payload = {postId: post_id, postedAt: posted_at};
@@ -180,21 +174,16 @@ async function post_job({body, id}) {
     try{
 
         const company = await Company.findById(id);
-
         var value = {
             companyName : company.companyName,    
             companyId : id,     
             companyLogo:company.profileImg,       
             ...body
         }
-
         const job = new Job(value);        
-
         var val = await job.save(); 
-
         var job_id = val._id;
         var company_id = id;
-        
         company.jobsPosted.push(job_id);
         await company.save();
     }
@@ -214,7 +203,6 @@ async function get_my_feed(id){
         for(i=0; i<connections.length;i++){
             var connecteeId = connections[i]; 
             var connecteeData = await User.findById(connecteeId);
-            // console.log(connecteeData);
             for(var j= 0; j<connecteeData.posts.length; j++){
                 var postId = connecteeData.posts[j].postId;
                 var postContent = await Post.findById(postId);
@@ -222,12 +210,7 @@ async function get_my_feed(id){
             }            
         }
         feed.sort(sortBy('posted_at'));
-        
-        // if(feed.length<=10){
-        //     return feed ;
-        // }
-
-        return feed; //.slice(0,10); 
+        return feed;  
     }
     catch(err){
         throw(err);
@@ -250,11 +233,7 @@ async function feed_company(id){
         }
         console.log(feed);
         feed.reverse();
-        // if(feed.length<=10){
-        return feed ;
-        // }
-
-        // return feed.slice(0,10); 
+        return feed ; 
     }
     catch(err){
         throw(err);

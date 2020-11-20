@@ -10,7 +10,7 @@ const connectMongo = async() => {
             useFindAndModify: false,
             useUnifiedTopology: true,
         });
-        console.log("connected");
+        console.log("Connected to Database");
     }
     catch(err){
         console.log(err); 
