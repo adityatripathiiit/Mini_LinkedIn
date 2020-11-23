@@ -19,7 +19,6 @@ async function signUpUser(data,sock){
 async function signUpCompany(data,sock){
     try{
         var res = await userControl.signupcompany(data.body);
-        console.log(res);
         parse_data(res,sock);
     }
     catch(err){
