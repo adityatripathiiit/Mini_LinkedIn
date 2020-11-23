@@ -16,7 +16,7 @@ module.exports = {
     getsingleusercompany,
     getallpendingconnections,
     getallusersinconnection,
-    getrecommendedusers,
+    getrecommendedusers,    
 };
 
 async function login(req) {

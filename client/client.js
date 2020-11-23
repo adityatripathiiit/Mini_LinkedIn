@@ -16,7 +16,7 @@ const clientState = {
     "data":null,
 };
 
-const privilegedCommands = ["sendConnection","acceptConnection","like","clap","support","endorseSkill","applyToJob","viewProfileUser","viewProfileCompany","connectionRecommendation"];
+const privilegedCommands = ["sendConnection","acceptConnection","like","clap","support","endorseSkill","applyToJob","viewProfileUser","viewProfileCompany","connectionRecommendation","jobRecommendation"];
 
 var myArg = process.argv.slice(2);
 var HOST = myArg[0];
@@ -72,8 +72,7 @@ async function takeInput(){
       console.log(" \n This is a priviledged command. Enter index below to execute command or type 'exit' to go back to normal command. \n");
 
       commandName = privilegedCommands[clientState.whichIndex];
-
-      console.log("I WANT DATA..");
+      
       var feededData = await prompt.get(commands.askForData[commandName]);
 
       clientState.firstTime = false; 

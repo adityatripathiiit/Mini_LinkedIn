@@ -5,6 +5,7 @@ module.exports = {
     applytojob,
     searchjob,
     postjob,
+    getjobrecommendations,
 }
 
 async function getalljobs(){
@@ -61,5 +62,18 @@ async function postjob({body, id}){
         console.log(err);
         res = {"status": "400", 'message': err, "data": {}};
         return res; 
+    }
+}
+
+async function getjobrecommendations(userId){
+    try{
+        var jobs  = await auth.get_job_recommendations(userId);
+        res = {"status": "200", 'message': 'successfully fetched all recommended jobs', 'data':jobs}; 
+        return res;
+    }
+    catch(err){
+        console.log(err);
+        res = {"status": "400", 'message': err, "data": {}};
+        return res;
     }
 }

@@ -102,6 +102,7 @@ async function postJob(data,sock){
         const token = jwt.decode(data.token); 
         const id = token.id;
         const body = data.body; 
+        body.skillSet = body.skillSet.split(" ");
         var res = await jobs.postjob({ body, id});
         parse_data(res,sock); 
     }
@@ -365,6 +366,26 @@ async function connectionRecommendation(data,sock){
     
 }
 
+async function jobRecommendation(data,sock){
+    try{
+        var index = data.body.index; 
+        var userId = jwt.decode(data.token).id;
+        var jobId = data.body.id;
+        if(index == -1){
+            var res = await jobs.getjobrecommendations(userId);
+            parse_data(res,sock);
+        }
+        else{
+            var res = await jobs.applytojob(userId,jobId);
+            parse_data(res,sock);
+        }
+    }
+    catch(err){
+        var res = {"status": "400", "message": err, data: {}};
+        parse_data(res,sock);
+    }
+}
+
 module.exports.signUpUser = signUpUser;
 module.exports.signUpCompany = signUpCompany;
 module.exports.login = login;
@@ -388,3 +409,4 @@ module.exports.viewProfileCompany = viewProfileCompany;
 module.exports.deleteAccount = deleteAccount; 
 module.exports.invalidCommand = invalidCommand; 
 module.exports.connectionRecommendation = connectionRecommendation;
+module.exports.jobRecommendation = jobRecommendation;
