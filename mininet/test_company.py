@@ -73,7 +73,7 @@ sleep(0.5)
 viewProfileCompany(str(indexOfJob[count]),str(indexOfApplicant[count]) ,c)
 sleep(10)
 logout(c)
-sleep(5)
+sleep(1)
 endsession(c)
 
 

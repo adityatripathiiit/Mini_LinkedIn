@@ -20,7 +20,7 @@ const privilegedCommands = ["sendConnection","acceptConnection","like","clap","s
 
 var myArg = process.argv.slice(2);
 var HOST = myArg[0];
-var PORT = 6969;
+var PORT = 6868;
 const BUFF_SIZE = 2; // in bytes2
 
 var clientToken = '';

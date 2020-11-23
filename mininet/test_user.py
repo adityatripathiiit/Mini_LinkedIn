@@ -69,35 +69,36 @@ support(str(index[count]),c)
 sleep(0.5)
 updateProfileUser(status[count], title[count],address[count], skills[count],c)
 
-sleep(0.5)
+sleep(2)
 getMyProfile(c)
 
 sleep(0.5)
 acceptConnection(str(index[count]),c)
 
-sleep(0.5)
+sleep(1)
 sendConnection(str(index[count]),c)
 
-sleep(0.5)
+sleep(1)
 createPost(content[count],c)
 
-sleep(0.5)
+sleep(2)
 getMyFeed(c)  
 
 sleep(0.5)
 searchJob(str(index[count]), c)
 
-sleep(0.5)
+sleep(2)
 endorseSkill(str(indexOfUser[count]), str(indexOfSkills[count]),c)
-sleep(0.5)
-
-applyToJob(str(index[count]),c)
 sleep(2)
 
+applyToJob(str(index[count]),c)
+sleep(5)
+
 viewProfileUser(str(index[count]),c)
-sleep(0.5)
+sleep(10)
 
 logout(c)
-# endsession(c)
+sleep(2)
+endsession(c)
 
 

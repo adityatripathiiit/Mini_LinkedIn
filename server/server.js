@@ -31,7 +31,7 @@ const connectMongo = require('./db/db');
 
 var myArg = process.argv.slice(2)
 var HOST = myArg[0];
-var PORT = 8888;
+var PORT = 6868;
 
 connectMongo();
 
