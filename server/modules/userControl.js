@@ -16,6 +16,7 @@ module.exports = {
     getsingleusercompany,
     getallpendingconnections,
     getallusersinconnection,
+    getrecommendedusers,    
 };
 
 async function login(req) {
@@ -262,6 +263,18 @@ async function getallusersinconnection(userId){
     try {
         var users  = await auth.get_all_users_in_connection(userId);
         res = {"status": "200", 'message': 'successfully fetched all users in connection', 'data':users}; 
+        return res;
+    } catch(err){
+        console.log(err);
+        res = {"status": "400", 'message': err, "data": {}};
+        return res;
+    }
+}
+
+async function getrecommendedusers(userId){
+    try {
+        var users  = await auth.get_all_users_in_recommendation(userId);
+        res = {"status": "200", 'message': 'successfully fetched all users in recommendation', 'data':users}; 
         return res;
     } catch(err){
         console.log(err);

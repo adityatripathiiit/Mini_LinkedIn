@@ -33,6 +33,9 @@ module.exports = {
     get_single_user_company,
     get_all_jobs,
     get_all_users_in_connection,
+    get_all_users_in_recommendation,
+    get_job_recommendations,
+    comment_on_post,
 };
 
 function sortBy(field) {
@@ -513,4 +516,72 @@ async function get_all_users_in_connection(userId){
     } catch(err){
         throw(err);
     }
+}
+
+async function get_all_users_in_recommendation(userId){
+    try {
+        var user = await User.findById(userId);
+        var recommended_user = new Set();
+        for(var index =0; index < user.connections.length; index++){
+            var connected_user =  await User.findById(user.connections[index]);
+            for(var index2 = 0; index2 < connected_user.connections.length; index2++){
+                recommended_user.add(connected_user.connections[index2]);
+            }
+        }
+
+        
+        
+        if(recommended_user.has(userId)) recommended_user.delete(userId);
+
+        for(var index =0; index < user.connections.length; index++){
+            if(recommended_user.has(user.connections[index])) recommended_user.delete(user.connections[index]);
+        }
+        
+
+        var users_to_return = []
+
+        var users_ids = Array.from(recommended_user);
+
+        for(var id in users_ids){
+            var _id = users_ids[id];
+            users_to_return.push( await User.findById(_id, {
+                "_id": 1,
+                "firstName": 1,
+                "lastName":1,
+                "email":1
+              }));
+        }        
+        
+        return users_to_return;
+
+    } catch(err){
+        throw(err);
+    }
+}
+
+async function get_job_recommendations(userId){
+    var user = await User.findById(userId);
+    
+    var all_jobs = await Job.find();
+
+    var jobs_to_recommend = [];
+    for(var job in all_jobs){        
+        job = all_jobs[job];
+        for(var skill in user.skills){
+            skillName = user.skills[skill].skillName;            
+            if(job.skillSet.includes(skillName)) {
+                jobs_to_recommend.push(job);
+                break;
+            } 
+        }
+    }    
+
+    return jobs_to_recommend;
+}
+
+async function comment_on_post(user_id, post_id, comment_text){
+    var post = await Post.findById(post_id);
+    post.comments.push({"user_id":user_id,"comment_text":comment_text});
+    
+    await post.save();
 }

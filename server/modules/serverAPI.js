@@ -2,7 +2,8 @@ const userControl = require('./userControl');
 const { parse_data} = require('./helper');
 const jwt = require('jsonwebtoken');
 const jobs  = require('./jobs');
-const posts = require('./posts')
+const posts = require('./posts');
+const user = require('../models/user');
 
 async function signUpUser(data,sock){
     try{
@@ -19,6 +20,7 @@ async function signUpUser(data,sock){
 async function signUpCompany(data,sock){
     try{
         var res = await userControl.signupcompany(data.body);
+        console.log(res);
         parse_data(res,sock);
     }
     catch(err){
@@ -101,7 +103,13 @@ async function postJob(data,sock){
         const token = jwt.decode(data.token); 
         const id = token.id;
         const body = data.body; 
-        var res = await jobs.postjob({ body, id});
+        var res;
+        if(!token.is_company) {
+            res = {"status": "400", "message": "Only company can post a job!", data: {}};
+        } else {
+            body.skillSet = body.skillSet.split(" ");
+            res = await jobs.postjob({ body, id});
+        }        
         parse_data(res,sock); 
     }
     catch(err){
@@ -207,6 +215,7 @@ async function like(data,sock){
         parse_data(res,sock);
     }
 }
+
 async function clap(data,sock){
     try{
         var index= data.body.index; 
@@ -344,6 +353,67 @@ async function invalidCommand(sock){
     parse_data(res,sock);
 }
 
+async function connectionRecommendation(data,sock){
+    try {
+        var index= data.body.index; 
+        var fromId = jwt.decode(data.token).id;
+        var toId = data.body.id;
+        if(index == -1){            
+            var res = await userControl.getrecommendedusers(fromId);
+            parse_data(res,sock);
+        }
+        else{            
+            var res = await userControl.sendconnection(fromId, toId);
+            parse_data(res,sock);
+        }
+    } catch(err){
+        var res = {"status":"400", "message":err, data:{}};
+        parse_data(res,sock);
+    } 
+    
+}
+
+async function jobRecommendation(data,sock){
+    try{
+        var index = data.body.index; 
+        var userId = jwt.decode(data.token).id;
+        var jobId = data.body.id;
+        if(index == -1){
+            var res = await jobs.getjobrecommendations(userId);
+            parse_data(res,sock);
+        }
+        else{
+            var res = await jobs.applytojob(userId,jobId);
+            parse_data(res,sock);
+        }
+    }
+    catch(err){
+        var res = {"status": "400", "message": err, data: {}};
+        parse_data(res,sock);
+    }
+}
+
+async function commentOnPost(data,sock){
+    try{
+        var index= data.body.index; 
+        var user_id = jwt.decode(data.token).id;
+        var post_id = data.body.post_id;
+        var comment_text = data.body.comment_text;
+        if(index == -1){
+            var res = await userControl.getmyfeed(user_id);
+            parse_data(res,sock);
+        }
+        else{
+            var res = await posts.commentonpost(user_id, post_id, comment_text);
+            parse_data(res,sock);
+        }
+    }
+    catch(err){
+        var res = {"status": "400", "message": err, data: {}};
+        parse_data(res,sock);
+    }
+}
+
 module.exports.signUpUser = signUpUser;
 module.exports.signUpCompany = signUpCompany;
 module.exports.login = login;
@@ -366,3 +436,6 @@ module.exports.viewProfileUser = viewProfileUser;
 module.exports.viewProfileCompany = viewProfileCompany; 
 module.exports.deleteAccount = deleteAccount; 
 module.exports.invalidCommand = invalidCommand; 
+module.exports.connectionRecommendation = connectionRecommendation;
+module.exports.jobRecommendation = jobRecommendation;
+module.exports.commentOnPost = commentOnPost;

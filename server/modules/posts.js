@@ -4,7 +4,8 @@ module.exports = {
     createpost,
     likepost,
     clappost,
-    supportpost
+    supportpost,
+    commentonpost,
 }
 
 async function createpost({body, id}){
@@ -69,6 +70,20 @@ async function supportpost({fromId, toPostId}){
         else {
             res = {"status": "300", "message": "Already supported!", "data": {}};
         }
+        return res;
+    }
+    catch(err){
+        console.log(err);
+        res = {"status": "400", 'message': err, "data": {}};
+        return res; 
+    }
+}
+
+async function commentonpost(user_id, post_id, comment_text){
+    var res;
+    try{
+        await auth.comment_on_post(user_id, post_id, comment_text);        
+        res = {"status": "200", "message": "Successfully posted comment!", "data": {}};        
         return res;
     }
     catch(err){

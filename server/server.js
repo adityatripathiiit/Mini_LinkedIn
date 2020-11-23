@@ -23,7 +23,10 @@ const {
   viewProfileUser,
   viewProfileCompany,
   deleteAccount,
-  invalidCommand
+  invalidCommand,
+  connectionRecommendation,
+  jobRecommendation,
+  commentOnPost,
 } = require('./modules/serverAPI');
 
 
@@ -31,7 +34,7 @@ const connectMongo = require('./db/db');
 
 var myArg = process.argv.slice(2)
 var HOST = myArg[0];
-var PORT = 6868;
+var PORT = 6969;
 
 connectMongo();
 
@@ -161,6 +164,15 @@ net.createServer(function(sock) {
               break;
             case 'deleteAccount' :
               deleteAccount(data,sock);
+              break;
+            case 'connectionRecommendation':
+              connectionRecommendation(data,sock);
+              break;
+            case 'jobRecommendation':
+              jobRecommendation(data,sock);
+              break;
+            case 'commentOnPost':
+              commentOnPost(data,sock);
               break;
             default:
               invalidCommand(sock);

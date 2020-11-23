@@ -16,11 +16,11 @@ const clientState = {
     "data":null,
 };
 
-const privilegedCommands = ["sendConnection","acceptConnection","like","clap","support","endorseSkill","applyToJob","viewProfileUser","viewProfileCompany"];
+const privilegedCommands = ["sendConnection","acceptConnection","like","clap","support","endorseSkill","applyToJob","viewProfileUser","viewProfileCompany","connectionRecommendation","jobRecommendation","commentOnPost"];
 
 var myArg = process.argv.slice(2);
 var HOST = myArg[0];
-var PORT = 6868;
+var PORT = 6969;
 const BUFF_SIZE = 2; // in bytes2
 
 var clientToken = '';
@@ -72,7 +72,7 @@ async function takeInput(){
       console.log(" \n This is a priviledged command. Enter index below to execute command or type 'exit' to go back to normal command. \n");
 
       commandName = privilegedCommands[clientState.whichIndex];
-
+      
       var feededData = await prompt.get(commands.askForData[commandName]);
 
       clientState.firstTime = false; 
@@ -94,7 +94,7 @@ async function takeInput(){
       } else if(commandName=='endorseSkill'){
         var indexOfUser = feededData.indexOfUser;
         var indexOfSkill = feededData.indexOfSkill;
-        if(indexOfJob=='exit' || indexOfApplicant=='exit'){
+        if(indexOfUser=='exit' || indexOfSkill=='exit'){
           resetState();
           return null;
         }
@@ -107,7 +107,24 @@ async function takeInput(){
           resetState();
           return null;
         }
-      } 
+      } else if(commandName=='commentOnPost'){
+        var indexOfPost = feededData.indexOfPost;
+        var commentText = feededData.commentText;
+        if(indexOfPost=='exit' || commentText=='exit'){
+          resetState();
+          return null;
+        }
+        try {
+          data.index = 1;
+          indexOfPost = parseInt(indexOfPost);
+          data.post_id = clientState.data[indexOfPost]._id;
+          data.comment_text = commentText;
+
+        } catch(err){
+          resetState();
+          return null;
+        }
+      }      
       else {
         var index = feededData.index;    
         if(index=='exit'){
