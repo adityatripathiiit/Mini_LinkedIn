@@ -567,17 +567,13 @@ async function get_job_recommendations(userId){
     for(var job in all_jobs){        
         job = all_jobs[job];
         for(var skill in user.skills){
-            skillName = user.skills[skill].skillName;
-            console.log(`Searching ${skillName} in ${job.skillSet}`);
-            console.log(job.skillSet);
+            skillName = user.skills[skill].skillName;            
             if(job.skillSet.includes(skillName)) {
                 jobs_to_recommend.push(job);
                 break;
             } 
         }
-    }
-
-    console.log(jobs_to_recommend);
+    }    
 
     return jobs_to_recommend;
 }
