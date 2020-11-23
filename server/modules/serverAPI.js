@@ -103,8 +103,13 @@ async function postJob(data,sock){
         const token = jwt.decode(data.token); 
         const id = token.id;
         const body = data.body; 
-        body.skillSet = body.skillSet.split(" ");
-        var res = await jobs.postjob({ body, id});
+        var res;
+        if(!token.is_company) {
+            res = {"status": "400", "message": "Only company can post a job!", data: {}};
+        } else {
+            body.skillSet = body.skillSet.split(" ");
+            res = await jobs.postjob({ body, id});
+        }        
         parse_data(res,sock); 
     }
     catch(err){
