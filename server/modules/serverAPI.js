@@ -345,6 +345,26 @@ async function invalidCommand(sock){
     parse_data(res,sock);
 }
 
+async function connectionRecommendation(data,sock){
+    try {
+        var index= data.body.index; 
+        var fromId = jwt.decode(data.token).id;
+        var toId = data.body.id;
+        if(index == -1){            
+            var res = await userControl.getrecommendedusers(fromId);
+            parse_data(res,sock);
+        }
+        else{            
+            var res = await userControl.sendconnection(fromId, toId);
+            parse_data(res,sock);
+        }
+    } catch(err){
+        var res = {"status":"400", "message":err, data:{}};
+        parse_data(res,sock);
+    } 
+    
+}
+
 module.exports.signUpUser = signUpUser;
 module.exports.signUpCompany = signUpCompany;
 module.exports.login = login;
@@ -367,3 +387,4 @@ module.exports.viewProfileUser = viewProfileUser;
 module.exports.viewProfileCompany = viewProfileCompany; 
 module.exports.deleteAccount = deleteAccount; 
 module.exports.invalidCommand = invalidCommand; 
+module.exports.connectionRecommendation = connectionRecommendation;

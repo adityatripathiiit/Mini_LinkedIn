@@ -33,6 +33,7 @@ module.exports = {
     get_single_user_company,
     get_all_jobs,
     get_all_users_in_connection,
+    get_all_users_in_recommendation,
 };
 
 function sortBy(field) {
@@ -510,6 +511,47 @@ async function get_all_users_in_connection(userId){
             user_in_conn.push(await User.findById(user.connections[index]));
         }
         return user_in_conn;
+    } catch(err){
+        throw(err);
+    }
+}
+
+async function get_all_users_in_recommendation(userId){
+    try {
+        var user = await User.findById(userId);
+        var recommended_user = new Set();
+        for(var index =0; index < user.connections.length; index++){
+            var connected_user =  await User.findById(user.connections[index]);
+            for(var index2 = 0; index2 < connected_user.connections.length; index2++){
+                recommended_user.add(connected_user.connections[index2]);
+            }
+        }
+
+        
+        
+        if(recommended_user.has(userId)) recommended_user.delete(userId);
+
+        for(var index =0; index < user.connections.length; index++){
+            if(recommended_user.has(user.connections[index])) recommended_user.delete(user.connections[index]);
+        }
+        
+
+        var users_to_return = []
+
+        var users_ids = Array.from(recommended_user);
+
+        for(var id in users_ids){
+            var _id = users_ids[id];
+            users_to_return.push( await User.findById(_id, {
+                "_id": 1,
+                "firstName": 1,
+                "lastName":1,
+                "email":1
+              }));
+        }        
+        
+        return users_to_return;
+
     } catch(err){
         throw(err);
     }

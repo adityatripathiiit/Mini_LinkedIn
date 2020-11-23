@@ -16,7 +16,7 @@ const clientState = {
     "data":null,
 };
 
-const privilegedCommands = ["sendConnection","acceptConnection","like","clap","support","endorseSkill","applyToJob","viewProfileUser","viewProfileCompany"];
+const privilegedCommands = ["sendConnection","acceptConnection","like","clap","support","endorseSkill","applyToJob","viewProfileUser","viewProfileCompany","connectionRecommendation"];
 
 var myArg = process.argv.slice(2);
 var HOST = myArg[0];
@@ -73,6 +73,7 @@ async function takeInput(){
 
       commandName = privilegedCommands[clientState.whichIndex];
 
+      console.log("I WANT DATA..");
       var feededData = await prompt.get(commands.askForData[commandName]);
 
       clientState.firstTime = false; 
@@ -94,7 +95,7 @@ async function takeInput(){
       } else if(commandName=='endorseSkill'){
         var indexOfUser = feededData.indexOfUser;
         var indexOfSkill = feededData.indexOfSkill;
-        if(indexOfJob=='exit' || indexOfApplicant=='exit'){
+        if(indexOfUser=='exit' || indexOfSkill=='exit'){
           resetState();
           return null;
         }
@@ -107,8 +108,7 @@ async function takeInput(){
           resetState();
           return null;
         }
-      } 
-      else {
+      } else {
         var index = feededData.index;    
         if(index=='exit'){
           resetState();

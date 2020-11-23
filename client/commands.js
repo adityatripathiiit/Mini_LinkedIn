@@ -21,7 +21,7 @@ const commandsArray = {
 		'19':'applyToJob',  
 		'20':'viewProfileUser',
 		'21':'viewProfileCompany', 		
-
+		'22':'connectionRecommendation'
 }
 
 const askForData = {
@@ -219,6 +219,13 @@ const askForData = {
 			},
 			"indexOfSkill":{
 				"required":true,				
+			}
+		}
+	},
+	"connectionRecommendation":{
+		"properties":{
+			"index":{
+				"required":true,
 			}
 		}
 	}

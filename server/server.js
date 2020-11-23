@@ -23,7 +23,8 @@ const {
   viewProfileUser,
   viewProfileCompany,
   deleteAccount,
-  invalidCommand
+  invalidCommand,
+  connectionRecommendation
 } = require('./modules/serverAPI');
 
 
@@ -161,6 +162,9 @@ net.createServer(function(sock) {
               break;
             case 'deleteAccount' :
               deleteAccount(data,sock);
+              break;
+            case 'connectionRecommendation':
+              connectionRecommendation(data,sock);
               break;
             default:
               invalidCommand(sock);
