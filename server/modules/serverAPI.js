@@ -2,7 +2,8 @@ const userControl = require('./userControl');
 const { parse_data} = require('./helper');
 const jwt = require('jsonwebtoken');
 const jobs  = require('./jobs');
-const posts = require('./posts')
+const posts = require('./posts');
+const user = require('../models/user');
 
 async function signUpUser(data,sock){
     try{
@@ -209,6 +210,7 @@ async function like(data,sock){
         parse_data(res,sock);
     }
 }
+
 async function clap(data,sock){
     try{
         var index= data.body.index; 
@@ -386,6 +388,27 @@ async function jobRecommendation(data,sock){
     }
 }
 
+async function commentOnPost(data,sock){
+    try{
+        var index= data.body.index; 
+        var user_id = jwt.decode(data.token).id;
+        var post_id = data.body.post_id;
+        var comment_text = data.body.comment_text;
+        if(index == -1){
+            var res = await userControl.getmyfeed(user_id);
+            parse_data(res,sock);
+        }
+        else{
+            var res = await posts.commentonpost(user_id, post_id, comment_text);
+            parse_data(res,sock);
+        }
+    }
+    catch(err){
+        var res = {"status": "400", "message": err, data: {}};
+        parse_data(res,sock);
+    }
+}
+
 module.exports.signUpUser = signUpUser;
 module.exports.signUpCompany = signUpCompany;
 module.exports.login = login;
@@ -410,3 +433,4 @@ module.exports.deleteAccount = deleteAccount;
 module.exports.invalidCommand = invalidCommand; 
 module.exports.connectionRecommendation = connectionRecommendation;
 module.exports.jobRecommendation = jobRecommendation;
+module.exports.commentOnPost = commentOnPost;

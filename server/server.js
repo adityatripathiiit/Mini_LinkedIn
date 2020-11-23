@@ -26,6 +26,7 @@ const {
   invalidCommand,
   connectionRecommendation,
   jobRecommendation,
+  commentOnPost,
 } = require('./modules/serverAPI');
 
 
@@ -169,6 +170,9 @@ net.createServer(function(sock) {
               break;
             case 'jobRecommendation':
               jobRecommendation(data,sock);
+              break;
+            case 'commentOnPost':
+              commentOnPost(data,sock);
               break;
             default:
               invalidCommand(sock);

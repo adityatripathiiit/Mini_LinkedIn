@@ -35,6 +35,7 @@ module.exports = {
     get_all_users_in_connection,
     get_all_users_in_recommendation,
     get_job_recommendations,
+    comment_on_post,
 };
 
 function sortBy(field) {
@@ -576,4 +577,11 @@ async function get_job_recommendations(userId){
     }    
 
     return jobs_to_recommend;
+}
+
+async function comment_on_post(user_id, post_id, comment_text){
+    var post = await Post.findById(post_id);
+    post.comments.push({"user_id":user_id,"comment_text":comment_text});
+    
+    await post.save();
 }

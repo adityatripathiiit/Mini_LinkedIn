@@ -23,6 +23,7 @@ const commandsArray = {
 		'21':'viewProfileCompany', 		
 		'22':'connectionRecommendation',
 		'23':'jobRecommendation',  
+		'24':'commentOnPost'
 }
 
 const askForData = {
@@ -233,6 +234,16 @@ const askForData = {
 	"jobRecommendation":{
 		"properties":{
 			"index":{
+				"required":true
+			}
+		}
+	},
+	"commentOnPost":{
+		"properties":{
+			"indexOfPost":{
+				"required":true
+			},
+			"commentText":{
 				"required":true
 			}
 		}

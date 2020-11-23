@@ -28,6 +28,16 @@ var postSchema = new mongoose.Schema({
         {
             type: String
         }
+    ],
+    comments:[
+        {
+            user_id:{
+                type:String
+            },
+            comment_text:{
+                type:String
+            }
+        }
     ]    
 
 },

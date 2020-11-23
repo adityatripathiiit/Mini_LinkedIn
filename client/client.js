@@ -16,7 +16,7 @@ const clientState = {
     "data":null,
 };
 
-const privilegedCommands = ["sendConnection","acceptConnection","like","clap","support","endorseSkill","applyToJob","viewProfileUser","viewProfileCompany","connectionRecommendation","jobRecommendation"];
+const privilegedCommands = ["sendConnection","acceptConnection","like","clap","support","endorseSkill","applyToJob","viewProfileUser","viewProfileCompany","connectionRecommendation","jobRecommendation","commentOnPost"];
 
 var myArg = process.argv.slice(2);
 var HOST = myArg[0];
@@ -107,7 +107,25 @@ async function takeInput(){
           resetState();
           return null;
         }
-      } else {
+      } else if(commandName=='commentOnPost'){
+        var indexOfPost = feededData.indexOfPost;
+        var commentText = feededData.commentText;
+        if(indexOfPost=='exit' || commentText=='exit'){
+          resetState();
+          return null;
+        }
+        try {
+          data.index = 1;
+          indexOfPost = parseInt(indexOfPost);
+          data.post_id = clientState.data[indexOfPost]._id;
+          data.comment_text = commentText;
+
+        } catch(err){
+          resetState();
+          return null;
+        }
+      }      
+      else {
         var index = feededData.index;    
         if(index=='exit'){
           resetState();
