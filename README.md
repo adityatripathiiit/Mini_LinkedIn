@@ -1,6 +1,6 @@
 # Mini-LinkedIn
 
-Mini-LinkedIn is a program using networking paradigms that supports important LinkedIn features like feed, job posting and searching, connecting and networking, creating companies, and building profiles. Mini-LinkedIn consists of several different features, taking inspiration from the popular social networking platform LinkedIn. The server and client model for Mini-LinkedIn work on TCP protocol, where the server serves the requests by the client(s). The server interacts with the database to retrieve, insert, delete and update data of the users/companies. 
+Mini-LinkedIn is a program using networking paradigms that supports important LinkedIn features like feed, job posting and searching, connecting and networking, creating companies, and building profiles. Mini-LinkedIn consists of several different features, taking inspiration from the popular social networking platform LinkedIn. The server and client model for Mini-LinkedIn work on TCP protocol, where the server serves the requests by the client(s). The server interacts with the database to retrieve, insert, delete and update data of the users/companies.
 
 Refer [here](./architecture/Mini-LinkedIn_Design_Document.pdf) for **detailed document** for design, architecture and testing.
 
@@ -204,27 +204,6 @@ copy the `interfaces` file from older versions and paste it in the directory.
 The server communicates and performs operations on the database directly by using APIs provided by the database (happens over HTTP).
 
 #
-## Security aspects
-#
-- As mentioned above, for every coming request from the client, the server verifies the token and command and then takes necessary action. If the authentication via the token fails the commands will not be handled by the server unless the client logins with proper credentials. 
-
-
-- The client is not permitted to perform any command except login/sign up without logging in. 
-
-
-
-- A user cannot access/use APIs for a company and a company cannot access/use the APIs for a user. For instance, only a user will be able to send connection requests to other users and a company cannot send connection requests. Similarly, a user will not be able to post jobs, only a company will be able to post jobs.  
-
-
-- The passwords entered by the client are obscured using (*) symbol for security.
-
-
-- All the data sent over TCP connection is encoded before sending. 
-
-
-- A user can only see posts of users who are in their connection. Similarly, a user who is already a connection of another user, can’t send another connection request. Similarly, a liked post cannot be liked again by the same user.
-
-#
 ## Implementation
 #
 ### Client-Server - Node.js
@@ -257,3 +236,24 @@ The receiver receives raw text in a loop from the other party and tries to conca
 This is how the sender and receiver knows where a particular data ends which makes a transaction between client-server as request-response message.
 
 Note: There is no extra overhead for sending JSON over TCP, as we stringify the JSON before sending it as a payload. Therefore, we are effectively sending a string over TCP and parsing that string at the other end of the connection.
+
+#
+## Security aspects
+#
+- As mentioned above, for every coming request from the client, the server verifies the token and command and then takes necessary action. If the authentication via the token fails the commands will not be handled by the server unless the client logins with proper credentials. 
+
+
+- The client is not permitted to perform any command except login/sign up without logging in. 
+
+
+
+- A user cannot access/use APIs for a company and a company cannot access/use the APIs for a user. For instance, only a user will be able to send connection requests to other users and a company cannot send connection requests. Similarly, a user will not be able to post jobs, only a company will be able to post jobs.  
+
+
+- The passwords entered by the client are obscured using (*) symbol for security.
+
+
+- All the data sent over TCP connection is encoded before sending. 
+
+
+- A user can only see posts of users who are in their connection. Similarly, a user who is already a connection of another user, can’t send another connection request. Similarly, a liked post cannot be liked again by the same user.
