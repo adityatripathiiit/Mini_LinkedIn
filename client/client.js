@@ -16,20 +16,41 @@ const clientState = {
     "data":null,
 };
 
-const privilegedCommands = ["sendConnection","acceptConnection","like","clap","support","endorseSkill","applyToJob","viewProfileUser","viewProfileCompany"];
+const privilegedCommands = ["sendConnection","acceptConnection","like","clap","support","endorseSkill","applyToJob","viewProfileUser","viewProfileCompany","connectionRecommendation","jobRecommendation","commentOnPost"];
 
-var HOST = '127.0.0.1';
+var myArg = process.argv.slice(2);
+var HOST = myArg[0];
 var PORT = 6969;
+const BUFF_SIZE = 2; // in bytes2
 
 var clientToken = '';
 
 var client = new net.Socket();
 
+function parse_data(data){
+    var sData = JSON.stringify(data);
+    var enData = Buffer.from(sData, 'utf-8');
+    enData = enData.toString('hex');
+    
+    const maxCount = enData.length/(2*BUFF_SIZE);
+    for(var i =0; i<maxCount; i++){
+      
+      client.write(enData.slice(i*2*BUFF_SIZE, (i+1)*2*BUFF_SIZE));
+    }
+    // Sending End Of Instruction
+    // console.log(Buffer.from('EOI', 'utf-8').toString('hex'))
+    client.write(Buffer.from('EOI', 'utf-8').toString('hex'));
+}
+
+
 client.connect(PORT, HOST, function() {
   printInitMessage();
-  const data = {"command": "", "body":"","token":clientToken};
-    
-  client.write(JSON.stringify(data));
+  var data = {"command": "", "body":"","token":clientToken};
+  
+  parse_data(data);
+
+
+  // client.write(JSON.stringify(data));
 });
 
 function resetState(){
@@ -51,7 +72,7 @@ async function takeInput(){
       console.log(" \n This is a priviledged command. Enter index below to execute command or type 'exit' to go back to normal command. \n");
 
       commandName = privilegedCommands[clientState.whichIndex];
-
+      
       var feededData = await prompt.get(commands.askForData[commandName]);
 
       clientState.firstTime = false; 
@@ -70,7 +91,41 @@ async function takeInput(){
           resetState();
           return null;
         }       
-      } else {
+      } else if(commandName=='endorseSkill'){
+        var indexOfUser = feededData.indexOfUser;
+        var indexOfSkill = feededData.indexOfSkill;
+        if(indexOfUser=='exit' || indexOfSkill=='exit'){
+          resetState();
+          return null;
+        }
+        try {
+          data.index = 1;
+          data.user_id = clientState.data[indexOfUser]._id;
+          data.skill_index = indexOfSkill;
+
+        } catch(err){
+          resetState();
+          return null;
+        }
+      } else if(commandName=='commentOnPost'){
+        var indexOfPost = feededData.indexOfPost;
+        var commentText = feededData.commentText;
+        if(indexOfPost=='exit' || commentText=='exit'){
+          resetState();
+          return null;
+        }
+        try {
+          data.index = 1;
+          indexOfPost = parseInt(indexOfPost);
+          data.post_id = clientState.data[indexOfPost]._id;
+          data.comment_text = commentText;
+
+        } catch(err){
+          resetState();
+          return null;
+        }
+      }      
+      else {
         var index = feededData.index;    
         if(index=='exit'){
           resetState();
@@ -117,7 +172,7 @@ async function takeInput(){
       const isThisPriviledged = privilegedCommands.includes(commandName);    
 
       if(!isThisPriviledged && commands.askForData[commandName]){      
-          data = await prompt.get(commands.askForData[commandName]);         
+          data = await prompt.get(commands.askForData[commandName]);   
       }     
 
       if(isThisPriviledged){
@@ -135,32 +190,49 @@ async function takeInput(){
 
 }
 
+var data ="";
 
-client.on('data', async function(data) {    
-  data = JSON.parse(data);  
+client.on('data', async function(recvData) {   
   
-  // set only for first time
-  if(clientState.firstTime && clientState.isPrivileged) clientState.data = data.data;  
-
-  console.log('Data from server is - \n')
-  console.log(util.inspect(data, {showHidden: false, depth: null}));
-
-
-  if(data.data.token != null){
-    clientToken = data.data.token; 
+  recvData = Buffer.from(recvData, 'hex').toString();
+  var flag = 0;
+  if(recvData.slice(-6) == '454f49'){
+    flag = 1;
+    var length = recvData.length;
+    recvData = recvData.slice(0,length-6);
   }
-  
-  var dataToSend = null;
-  while(!dataToSend){
-     dataToSend = await takeInput();
-     if(!dataToSend) {       
-       continue;
-     }
-  }        
+  data += recvData;
+    
+  if(flag == 1){
+    data = Buffer.from(data, 'hex').toString();
+    data = JSON.parse(data); 
+    
+    // set only for first time
+    if(clientState.firstTime && clientState.isPrivileged) clientState.data = data.data;  
 
-  console.log('Sending this data - \n');
-  console.log(util.inspect(dataToSend, {showHidden: false, depth: null}));
-  client.write(JSON.stringify(dataToSend));
+    console.log('Data from server is - \n')
+    console.log(util.inspect(data, {showHidden: false, depth: null}));
+
+
+    if(data.data.token != null){
+      clientToken = data.data.token; 
+    }
+    
+    var dataToSend = null;
+    data = "";
+    while(!dataToSend){
+      dataToSend = await takeInput();
+      if(!dataToSend) {       
+        continue;
+      }
+    }        
+
+    console.log('Sending this data - \n');
+    console.log(util.inspect(dataToSend, {showHidden: false, depth: null}));
+
+    parse_data(dataToSend);
+    // client.write(JSON.stringify(dataToSend));
+  }
 
 });
 
