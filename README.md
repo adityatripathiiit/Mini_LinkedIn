@@ -6,7 +6,7 @@ Mini-LinkedIn is a program using networking paradigms that supports important Li
 
 The client-server-database architecture is shown below.
 
-![picture alt](./architecture/Client_Server_Database.png "Architecture")
+![picture alt](./architecture/client_server_database.png "Architecture")
 
 ## Server Architecture
 
