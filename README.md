@@ -100,6 +100,7 @@ Privileged features like updating profile, getting feed etc. are not accessible 
 #
 ## Features and Use Cases ✅
 #
+```
 ✅ The client is able to register and set up an account either as a company or normal user. 
 ✅ The client is able to login and logout with Mini-LinkedIn. 
 ✅ Users are able to set up a custom profile with fields like skills, about, experience etc. in case of a user profile and set fields like company name, about etc. in case of a company profile.
@@ -116,7 +117,7 @@ Privileged features like updating profile, getting feed etc. are not accessible 
 ✅ Job recommendations based on the skills provided by the user are provided.
 ✅ Connection recommendations are provided.
 ✅ Comments on post and multiple reactions (such as like, clap and support) on a connection’s post are provided.
-
+```
 
 ## Instructions to Install Database :arrow_down:
 
