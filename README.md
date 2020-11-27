@@ -103,12 +103,14 @@ Privileged features like updating profile, getting feed etc. are not accessible 
 ```
 ✅ The client is able to register and set up an account either as a company or normal user. 
 ✅ The client is able to login and logout with Mini-LinkedIn. 
-✅ Users are able to set up a custom profile with fields like skills, about, experience etc. in case of a user profile and set fields like company name, about etc. in case of a company profile.
+✅ Users are able to set up a custom profile with fields like skills, about, experience etc. in case of 
+   a user profile and set fields like company name, about etc. in case of a company profile.
 ✅ Users are able to send and accept connection requests from other users.
 ✅ Users are able to create LinkedIn posts, like posts and view posts of their connections.
 ✅ Display the number of users who viewed a person’s profile.
 ✅ Display the information of users who endorse specific skills.
-✅ Only companies are able to post job updates. All the registered users can search for job postings with skill filters.
+✅ Only companies are able to post job updates. All the registered users can search for job postings 
+   with skill filters.
 ✅ Companies are able to see the users who have applied for the job they posted.
 ✅ The server is a concurrent program that can handle several client requests. 
 ✅ Users are authenticated with the server before trying to access any of the features. 
@@ -116,7 +118,8 @@ Privileged features like updating profile, getting feed etc. are not accessible 
 ✅ A user can only see the posts of users who are in their connection. 
 ✅ Job recommendations based on the skills provided by the user are provided.
 ✅ Connection recommendations are provided.
-✅ Comments on post and multiple reactions (such as like, clap and support) on a connection’s post are provided.
+✅ Comments on post and multiple reactions (such as like, clap and support) on a connection’s post 
+   are provided.
 ```
 
 ## Instructions to Install Database :arrow_down:
