@@ -4,6 +4,8 @@ Mini-LinkedIn is a program using networking paradigms that supports important Li
 
 Refer [here](./architecture/Project_Proposal_Mini_LinkedIn.pdf) for our **project proposal** for Mini-LinkedIn.
 
+Refer [here](./architecture/Mini-Linkedin_Presentation.pdf) for our **presentation slides** for Mini-LinkedIn.
+
 Refer [here](./architecture/Mini-LinkedIn_Design_Document.pdf) for **detailed document** for design, architecture and testing.
 
 #
