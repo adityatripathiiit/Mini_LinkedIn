@@ -8,6 +8,8 @@ Refer [here](./architecture/Mini-Linkedin_Presentation.pdf) for our **presentati
 
 Refer [here](./architecture/Mini-LinkedIn_Design_Document.pdf) for **detailed document** for design, architecture and testing.
 
+Refer [here](https://drive.google.com/file/d/1vJW2BivOlTaVQUtTXIGNVeY_G1q-XK-u/view?usp=drivesdk) for **demonstration video** of our project. 
+
 #
 ## Codebase Directory Architecture: 📁
 #
@@ -191,6 +193,9 @@ copy the `interfaces` file from older versions and paste it in the directory.
 * Run `python3 gen_data_user.py` or `python3 gen_data_company.py` to generate workload for user and company respectively.
 * In the mininet folder, run `sudo python3 mini_test_user.py` to run tests for user or run `sudo python3 mini_test_company.py` to run tests for company.
 
+Note: We have used a fat tree topology for testing, with depth 2 and fanout 4. 
+Here is the structure of the Fat tree topology: 
+![picture alt](./architecture/fat_tree.png "fat tree")
 #
 ## Networking Paradigm :computer:
 #
